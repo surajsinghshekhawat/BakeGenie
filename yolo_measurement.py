@@ -16,33 +16,138 @@ logger = logging.getLogger(__name__)
 
 class MeasurementDetector:
     def __init__(self):
-        """Initialize the YOLO model and measurement system"""
-        # Load YOLO model with custom configuration
-        model_path = 'yolov8n.pt'  # Use nano model for faster detection
-        if not os.path.exists(model_path):
-            logger.error(f"YOLO model file not found: {model_path}")
-            raise FileNotFoundError(f"YOLO model file not found: {model_path}")
+        """Initialize the measurement detector with YOLOv8 model"""
+        try:
+            # Use YOLOv8n model for faster detection
+            model_path = 'yolov8n.pt'
+            if not os.path.exists(model_path):
+                logger.error(f"YOLO model file not found at {model_path}")
+                raise FileNotFoundError(f"YOLO model file not found at {model_path}")
             
-        self.model = YOLO(model_path)
-        logger.info(f"Loaded YOLO model from {model_path}")
-        
-        # Configure model parameters
-        self.model.conf = 0.15  # Lower confidence threshold for better detection
-        self.model.iou = 0.4    # Lower IOU threshold
-        self.model.max_det = 20 # Increase maximum number of detections
-        
-        # Define measurement tool classes and their corresponding YOLO class IDs
-        # YOLO class IDs: spoon (44, 46, 47), bowl (45), cup (41)
-        self.tool_classes = {
-            'measuring_spoon': [44, 46, 47],  # multiple spoon classes
-            'measuring_cup': [41, 45]  # cup and bowl classes
-        }
-        
-        # Initialize detection cache
-        self.last_detection = None
-        self.detection_confidence = 0.15  # Lower confidence threshold
-        
-        logger.info("Measurement detector initialized with enhanced configuration")
+            self.model = YOLO(model_path)
+            logger.info("YOLO model loaded successfully")
+            
+            # Configure model parameters
+            self.conf_threshold = 0.15  # Lower confidence threshold for better detection
+            self.iou_threshold = 0.4    # Lower IOU threshold for better detection
+            self.max_det = 20           # Increase maximum detections
+            
+            # Define measurement tool classes
+            self.spoon_classes = [44, 46, 47]  # Multiple class IDs for spoons
+            self.cup_classes = [45, 48]        # Multiple class IDs for cups
+            
+            logger.info("Measurement detector initialized with enhanced configuration")
+            
+        except Exception as e:
+            logger.error(f"Error initializing measurement detector: {e}")
+            raise
+    
+    def detect_tools(self, frame):
+        """Detect measuring tools in the frame"""
+        try:
+            # Run YOLO detection
+            results = self.model(frame, conf=self.conf_threshold, iou=self.iou_threshold, max_det=self.max_det)[0]
+            
+            # Initialize lists for detections
+            spoons = []
+            cups = []
+            
+            # Process detections
+            for box in results.boxes:
+                class_id = int(box.cls[0])
+                confidence = float(box.conf[0])
+                x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                
+                # Calculate aspect ratio
+                width = x2 - x1
+                height = y2 - y1
+                aspect_ratio = width / height if height > 0 else 0
+                
+                # Log detection details
+                logger.info(f"Detection: class={class_id}, conf={confidence:.2f}, ratio={aspect_ratio:.2f}")
+                
+                # Check if detection is a spoon
+                if class_id in self.spoon_classes and 0.3 < aspect_ratio < 3.0:
+                    spoons.append({
+                        'bbox': (x1, y1, x2, y2),
+                        'confidence': confidence,
+                        'class_id': class_id
+                    })
+                
+                # Check if detection is a cup
+                elif class_id in self.cup_classes and 0.5 < aspect_ratio < 2.0:
+                    cups.append({
+                        'bbox': (x1, y1, x2, y2),
+                        'confidence': confidence,
+                        'class_id': class_id
+                    })
+            
+            logger.info(f"Found {len(spoons)} spoons and {len(cups)} cups")
+            return spoons, cups
+            
+        except Exception as e:
+            logger.error(f"Error detecting tools: {e}")
+            return [], []
+    
+    def estimate_volume(self, tool_type, bbox):
+        """Estimate the volume of ingredients in the detected tool"""
+        try:
+            x1, y1, x2, y2 = bbox
+            width = x2 - x1
+            height = y2 - y1
+            
+            # Calculate volume based on tool type and size
+            if tool_type == 'spoon':
+                # Assume standard tablespoon is about 15ml
+                volume = (width * height) / 1000  # Convert to ml
+                return max(5, min(volume, 30))  # Limit between 5ml and 30ml
+            
+            elif tool_type == 'cup':
+                # Assume standard cup is about 240ml
+                volume = (width * height) / 100  # Convert to ml
+                return max(30, min(volume, 500))  # Limit between 30ml and 500ml
+            
+            return 0
+            
+        except Exception as e:
+            logger.error(f"Error estimating volume: {e}")
+            return 0
+    
+    def process_measurements(self, frame):
+        """Process the frame and return detected measurements"""
+        try:
+            # Detect tools
+            spoons, cups = self.detect_tools(frame)
+            
+            # Process measurements
+            measurements = []
+            
+            # Process spoons
+            for spoon in spoons:
+                volume = self.estimate_volume('spoon', spoon['bbox'])
+                measurements.append({
+                    'type': 'spoon',
+                    'volume': volume,
+                    'confidence': spoon['confidence'],
+                    'bbox': spoon['bbox']
+                })
+            
+            # Process cups
+            for cup in cups:
+                volume = self.estimate_volume('cup', cup['bbox'])
+                measurements.append({
+                    'type': 'cup',
+                    'volume': volume,
+                    'confidence': cup['confidence'],
+                    'bbox': cup['bbox']
+                })
+            
+            logger.info(f"Processed {len(measurements)} measurements")
+            return measurements
+            
+        except Exception as e:
+            logger.error(f"Error processing measurements: {e}")
+            return []
     
     def preprocess_frame(self, frame):
         """Preprocess frame for better detection"""
@@ -54,122 +159,23 @@ class MeasurementDetector:
         
         return normalized
     
-    def detect_tools(self, frame):
-        """Detect measuring tools in the frame"""
-        # Run YOLO detection
-        results = self.model(frame, verbose=False)
-        
-        # Process results
-        detections = []
-        debug_frame = frame.copy()
-        
-        for result in results:
-            boxes = result.boxes
-            logger.info(f"Found {len(boxes)} detections")
-            
-            for box in boxes:
-                # Get box coordinates and convert to integers
-                x1, y1, x2, y2 = map(int, box.xyxy[0].cpu().numpy())
-                confidence = float(box.conf.cpu().numpy()[0])
-                class_id = int(box.cls.cpu().numpy()[0])
-                
-                # Calculate aspect ratio
-                width = x2 - x1
-                height = y2 - y1
-                aspect_ratio = width / height if height > 0 else 0
-                
-                logger.info(f"Detection: class={class_id}, conf={confidence:.2f}, aspect_ratio={aspect_ratio:.2f}")
-                
-                # Determine tool type based on class ID
-                tool_type = None
-                for tool, class_ids in self.tool_classes.items():
-                    if class_id in class_ids:
-                        tool_type = tool
-                        break
-                
-                if tool_type:
-                    logger.info(f"Matched tool type: {tool_type}")
-                    # For spoons, check aspect ratio
-                    if 'spoon' in tool_type:
-                        if 0.3 < aspect_ratio < 3.0:  # More lenient aspect ratio check
-                            detection = {
-                                'bbox': (x1, y1, x2, y2),
-                                'confidence': float(confidence),
-                                'class': tool_type
-                            }
-                            detections.append(detection)
-                    else:
-                        detection = {
-                            'bbox': (x1, y1, x2, y2),
-                            'confidence': float(confidence),
-                            'class': tool_type
-                        }
-                        detections.append(detection)
-                    
-                    # Draw detection on debug frame
-                    cv2.rectangle(debug_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    label = f"{tool_type}: {confidence:.2f}"
-                    cv2.putText(debug_frame, label, (x1, y1-10),
-                              cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-        
-        logger.info(f"Final number of detections: {len(detections)}")
-        return detections, debug_frame
-    
-    def estimate_volume(self, frame, detection):
-        """Estimate volume of ingredient in the detected tool"""
-        x1, y1, x2, y2 = detection['bbox']
-        tool_region = frame[y1:y2, x1:x2]
-        
-        if tool_region.size == 0:
-            return 0
-        
-        # Convert to HSV for better ingredient detection
-        hsv = cv2.cvtColor(tool_region, cv2.COLOR_BGR2HSV)
-        
-        # Calculate fill level using adaptive thresholding
-        gray = cv2.cvtColor(tool_region, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                     cv2.THRESH_BINARY_INV, 11, 2)
-        
-        # Calculate fill percentage
-        height = y2 - y1
-        sections = 20  # Increase number of sections for more precise measurement
-        section_height = height / sections
-        filled_sections = 0
-        
-        for i in range(sections):
-            section_y = int(y1 + (sections - i - 1) * section_height)
-            section = thresh[int(section_y - section_height):int(section_y), :]
-            
-            if section.size > 0:
-                # Calculate fill using both color and texture
-                fill_ratio = np.count_nonzero(section) / section.size
-                avg_saturation = np.mean(hsv[int(section_y - section_height):int(section_y), :, 1])
-                
-                if fill_ratio > 0.2 or avg_saturation > 30:
-                    filled_sections += 1
-        
-        fill_percentage = (filled_sections / sections) * 100
-        return min(100, max(0, fill_percentage))  # Clamp between 0 and 100
-    
     def process_measurement(self, frame, ingredient_name, measurement_type):
         """Process frame to detect tools and measure ingredients"""
         # Detect tools
-        detections, debug_frame = self.detect_tools(frame)
+        spoons, cups = self.detect_tools(frame)
         
-        if not detections:
+        if not spoons and not cups:
             return {
                 'success': False,
                 'message': 'No measuring tools detected',
-                'debug_frame': debug_frame
+                'debug_frame': frame
             }
         
         # Find best detection matching the measurement type
         best_detection = None
-        for detection in detections:
-            if ('cup' in measurement_type and 'measuring_cup' in detection['class']) or \
-               ('spoon' in measurement_type and 'measuring_spoon' in detection['class']):
+        for detection in spoons + cups:
+            if ('cup' in measurement_type and detection['class_id'] in self.cup_classes) or \
+               ('spoon' in measurement_type and detection['class_id'] in self.spoon_classes):
                 if best_detection is None or detection['confidence'] > best_detection['confidence']:
                     best_detection = detection
         
@@ -177,11 +183,11 @@ class MeasurementDetector:
             return {
                 'success': False,
                 'message': f'No matching {measurement_type} detected',
-                'debug_frame': debug_frame
+                'debug_frame': frame
             }
         
         # Estimate volume
-        fill_percentage = self.estimate_volume(frame, best_detection)
+        fill_percentage = self.estimate_volume(measurement_type, best_detection['bbox'])
         
         # Get measurement data
         measurement_data = get_measurement_by_name(measurement_type)
@@ -189,7 +195,7 @@ class MeasurementDetector:
             return {
                 'success': False,
                 'message': f'Unknown measurement type: {measurement_type}',
-                'debug_frame': debug_frame
+                'debug_frame': frame
             }
         
         # Calculate volume
@@ -202,7 +208,7 @@ class MeasurementDetector:
             return {
                 'success': False,
                 'message': f'Unknown ingredient: {ingredient_name}',
-                'debug_frame': debug_frame
+                'debug_frame': frame
             }
         
         # Get density with fallback
@@ -212,11 +218,11 @@ class MeasurementDetector:
         weight = actual_volume * density
         
         # Add measurement info to debug frame
-        cv2.putText(debug_frame, f"Fill: {fill_percentage:.1f}%", (10, 30),
+        cv2.putText(frame, f"Fill: {fill_percentage:.1f}%", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-        cv2.putText(debug_frame, f"Volume: {actual_volume:.1f}ml", (10, 60),
+        cv2.putText(frame, f"Volume: {actual_volume:.1f}ml", (10, 60),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-        cv2.putText(debug_frame, f"Weight: {weight:.1f}g", (10, 90),
+        cv2.putText(frame, f"Weight: {weight:.1f}g", (10, 90),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
         
         return {
@@ -225,5 +231,5 @@ class MeasurementDetector:
             'weight_g': round(weight, 2),
             'fill_percentage': round(fill_percentage),
             'confidence': round(best_detection['confidence'] * 100, 2),
-            'debug_frame': debug_frame
+            'debug_frame': frame
         } 
