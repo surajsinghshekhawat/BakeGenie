@@ -18,6 +18,7 @@ SAMPLE_RECIPES = [
     {
         'name': 'Classic Chocolate Chip Cookies',
         'description': 'Soft and chewy cookies loaded with chocolate chips',
+        'dietary': 'Vegetarian',  # No meat products
         'ingredients': [
             {'name': 'All Purpose Flour', 'amount': 2.25, 'unit': 'cups'},
             {'name': 'Unsalted Butter', 'amount': 1, 'unit': 'cup'},
@@ -49,6 +50,7 @@ SAMPLE_RECIPES = [
     {
         'name': 'Classic Vanilla Cake',
         'description': 'Light and fluffy vanilla cake perfect for any occasion',
+        'dietary': 'Vegetarian',  # No meat products
         'ingredients': [
             {'name': 'Cake Flour', 'amount': 3, 'unit': 'cups'},
             {'name': 'Baking Powder', 'amount': 1, 'unit': 'tablespoon'},
@@ -79,6 +81,7 @@ SAMPLE_RECIPES = [
     {
         'name': 'Homemade Sourdough Bread',
         'description': 'Artisanal sourdough bread with a crispy crust and chewy interior',
+        'dietary': 'Vegetarian',  # No meat products
         'ingredients': [
             {'name': 'Bread Flour', 'amount': 4, 'unit': 'cups'},
             {'name': 'Active Sourdough Starter', 'amount': 1, 'unit': 'cup'},
@@ -105,6 +108,7 @@ SAMPLE_RECIPES = [
     {
         'name': 'Fudgy Chocolate Brownies',
         'description': 'Rich and fudgy brownies with a crackly top',
+        'dietary': 'Vegetarian',  # No meat products
         'ingredients': [
             {'name': 'Unsalted Butter', 'amount': 1, 'unit': 'cup'},
             {'name': 'Dark Chocolate', 'amount': 8, 'unit': 'ounces'},
@@ -135,6 +139,7 @@ SAMPLE_RECIPES = [
     {
         'name': 'Buttery Croissants',
         'description': 'Flaky and buttery French croissants',
+        'dietary': 'Vegetarian',  # No meat products
         'ingredients': [
             {'name': 'Bread Flour', 'amount': 4, 'unit': 'cups'},
             {'name': 'Active Dry Yeast', 'amount': 2.25, 'unit': 'teaspoons'},
@@ -164,6 +169,7 @@ SAMPLE_RECIPES = [
     {
         'name': 'Banana Walnut Bread',
         'description': 'Moist and flavorful banana bread loaded with walnuts',
+        'dietary': 'Vegetarian',  # No meat products
         'ingredients': [
             {'name': 'Ripe Bananas', 'amount': 3, 'unit': 'large'},
             {'name': 'All Purpose Flour', 'amount': 2, 'unit': 'cups'},
@@ -195,6 +201,7 @@ SAMPLE_RECIPES = [
     {
         'name': 'French Baguettes',
         'description': 'Classic French bread with a crispy crust and soft interior',
+        'dietary': 'Vegetarian',  # No meat products
         'ingredients': [
             {'name': 'Bread Flour', 'amount': 4, 'unit': 'cups'},
             {'name': 'Active Dry Yeast', 'amount': 2.25, 'unit': 'teaspoons'},

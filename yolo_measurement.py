@@ -18,25 +18,20 @@ class MeasurementDetector:
     def __init__(self):
         """Initialize the measurement detector with YOLOv8 model"""
         try:
-            # Use YOLOv8n model for faster detection
-            model_path = 'yolov8n.pt'
-            if not os.path.exists(model_path):
-                logger.error(f"YOLO model file not found at {model_path}")
-                raise FileNotFoundError(f"YOLO model file not found at {model_path}")
-            
-            self.model = YOLO(model_path)
+            # Use YOLOv8n model directly
+            self.model = YOLO('yolov8n.pt')
             logger.info("YOLO model loaded successfully")
             
-            # Configure model parameters
-            self.conf_threshold = 0.15  # Lower confidence threshold for better detection
-            self.iou_threshold = 0.4    # Lower IOU threshold for better detection
-            self.max_det = 20           # Increase maximum detections
+            # Configure model parameters - restore original working values
+            self.conf_threshold = 0.3    # Original confidence threshold
+            self.iou_threshold = 0.5     # Original IOU threshold
+            self.max_det = 5             # Original maximum detections
             
-            # Define measurement tool classes
-            self.spoon_classes = [44, 46, 47]  # Multiple class IDs for spoons
-            self.cup_classes = [45, 48]        # Multiple class IDs for cups
+            # Define measurement tool classes - restore original working IDs
+            self.spoon_classes = [44]    # Original spoon class ID
+            self.cup_classes = [45]      # Original cup class ID
             
-            logger.info("Measurement detector initialized with enhanced configuration")
+            logger.info("Measurement detector initialized with original working configuration")
             
         except Exception as e:
             logger.error(f"Error initializing measurement detector: {e}")
@@ -66,7 +61,7 @@ class MeasurementDetector:
                 # Log detection details
                 logger.info(f"Detection: class={class_id}, conf={confidence:.2f}, ratio={aspect_ratio:.2f}")
                 
-                # Check if detection is a spoon
+                # Check if detection is a spoon - restore original ratio check
                 if class_id in self.spoon_classes and 0.3 < aspect_ratio < 3.0:
                     spoons.append({
                         'bbox': (x1, y1, x2, y2),
@@ -74,7 +69,7 @@ class MeasurementDetector:
                         'class_id': class_id
                     })
                 
-                # Check if detection is a cup
+                # Check if detection is a cup - restore original ratio check
                 elif class_id in self.cup_classes and 0.5 < aspect_ratio < 2.0:
                     cups.append({
                         'bbox': (x1, y1, x2, y2),
@@ -119,6 +114,23 @@ class MeasurementDetector:
             # Detect tools
             spoons, cups = self.detect_tools(frame)
             
+            # Draw bounding boxes on the frame
+            debug_frame = frame.copy()
+            
+            # Draw spoon bounding boxes in green
+            for spoon in spoons:
+                x1, y1, x2, y2 = spoon['bbox']
+                cv2.rectangle(debug_frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                cv2.putText(debug_frame, f"Spoon {spoon['confidence']:.2f}", (int(x1), int(y1) - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
+            # Draw cup bounding boxes in blue
+            for cup in cups:
+                x1, y1, x2, y2 = cup['bbox']
+                cv2.rectangle(debug_frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 0, 0), 2)
+                cv2.putText(debug_frame, f"Cup {cup['confidence']:.2f}", (int(x1), int(y1) - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+            
             # Process measurements
             measurements = []
             
@@ -143,11 +155,11 @@ class MeasurementDetector:
                 })
             
             logger.info(f"Processed {len(measurements)} measurements")
-            return measurements
+            return measurements, debug_frame
             
         except Exception as e:
             logger.error(f"Error processing measurements: {e}")
-            return []
+            return [], frame
     
     def preprocess_frame(self, frame):
         """Preprocess frame for better detection"""
@@ -164,11 +176,28 @@ class MeasurementDetector:
         # Detect tools
         spoons, cups = self.detect_tools(frame)
         
+        # Draw bounding boxes on the frame
+        debug_frame = frame.copy()
+        
+        # Draw spoon bounding boxes in green
+        for spoon in spoons:
+            x1, y1, x2, y2 = spoon['bbox']
+            cv2.rectangle(debug_frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+            cv2.putText(debug_frame, f"Spoon {spoon['confidence']:.2f}", (int(x1), int(y1) - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+        # Draw cup bounding boxes in blue
+        for cup in cups:
+            x1, y1, x2, y2 = cup['bbox']
+            cv2.rectangle(debug_frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 0, 0), 2)
+            cv2.putText(debug_frame, f"Cup {cup['confidence']:.2f}", (int(x1), int(y1) - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+        
         if not spoons and not cups:
             return {
                 'success': False,
                 'message': 'No measuring tools detected',
-                'debug_frame': frame
+                'debug_frame': debug_frame
             }
         
         # Find best detection matching the measurement type
@@ -183,7 +212,7 @@ class MeasurementDetector:
             return {
                 'success': False,
                 'message': f'No matching {measurement_type} detected',
-                'debug_frame': frame
+                'debug_frame': debug_frame
             }
         
         # Estimate volume
@@ -195,7 +224,7 @@ class MeasurementDetector:
             return {
                 'success': False,
                 'message': f'Unknown measurement type: {measurement_type}',
-                'debug_frame': frame
+                'debug_frame': debug_frame
             }
         
         # Calculate volume
@@ -208,7 +237,7 @@ class MeasurementDetector:
             return {
                 'success': False,
                 'message': f'Unknown ingredient: {ingredient_name}',
-                'debug_frame': frame
+                'debug_frame': debug_frame
             }
         
         # Get density with fallback
@@ -218,11 +247,11 @@ class MeasurementDetector:
         weight = actual_volume * density
         
         # Add measurement info to debug frame
-        cv2.putText(frame, f"Fill: {fill_percentage:.1f}%", (10, 30),
+        cv2.putText(debug_frame, f"Fill: {fill_percentage:.1f}%", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-        cv2.putText(frame, f"Volume: {actual_volume:.1f}ml", (10, 60),
+        cv2.putText(debug_frame, f"Volume: {actual_volume:.1f}ml", (10, 60),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-        cv2.putText(frame, f"Weight: {weight:.1f}g", (10, 90),
+        cv2.putText(debug_frame, f"Weight: {weight:.1f}g", (10, 90),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
         
         return {
@@ -231,5 +260,5 @@ class MeasurementDetector:
             'weight_g': round(weight, 2),
             'fill_percentage': round(fill_percentage),
             'confidence': round(best_detection['confidence'] * 100, 2),
-            'debug_frame': frame
+            'debug_frame': debug_frame
         } 

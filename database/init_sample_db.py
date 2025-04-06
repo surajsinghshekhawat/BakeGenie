@@ -83,7 +83,7 @@ def init_sample_db():
             ingredients = recipe_data.pop('ingredients', [])
             
             # Generate image path
-            image_name = recipe_data['name'].lower().replace(' ', '-') + '.jpg'
+            image_name = recipe_data['name'].lower().replace(' ', '_') + '.jpg'
             image_path = f'/static/images/recipes/{image_name}'
             
             # Insert recipe
@@ -98,7 +98,8 @@ def init_sample_db():
             ''', (
                 recipe_data['name'], recipe_data.get('description', ''),
                 recipe_data.get('instructions', ''), image_path,
-                recipe_data.get('dietary', 'Standard'), recipe_data.get('difficulty', 'Medium'),
+                recipe_data.get('dietary', 'Non-Vegetarian'),  # Default to Non-Vegetarian if not specified
+                recipe_data.get('difficulty', 'Medium'),
                 recipe_data.get('servings', 4), recipe_data.get('prep_time', 30),
                 recipe_data.get('cook_time', 30), recipe_data.get('total_time', 60),
                 recipe_data.get('calories', 0), recipe_data.get('protein', 0),

@@ -18,8 +18,9 @@ import torchvision
 from dotenv import load_dotenv
 
 # Import our database modules
-from database.ingredients_db import get_all_ingredients, get_ingredient_by_name, get_all_measurements, get_measurement_by_name
+from database.ingredients_db import get_all_ingredients, get_ingredient_by_name, get_all_measurements, get_measurement_by_name, init_ingredients_db
 from database.recipes_db import get_all_recipes, get_recipe_by_id, search_recipes, find_recipes_by_ingredients, init_recipes_db
+from init_databases import init_all_databases
 
 # Import measurement module
 from yolo_measurement import MeasurementDetector
@@ -37,6 +38,8 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs('static/images/ingredients', exist_ok=True)
+os.makedirs('static/images/recipes', exist_ok=True)
 
 # Initialize Gemini Pro Vision
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
@@ -56,9 +59,13 @@ yolo_model = YOLO('yolov8n.pt')
 # Initialize measurement detector
 measurement_detector = MeasurementDetector()
 
-# Initialize database if it doesn't exist
-if not os.path.exists('database/recipes.db'):
-    init_recipes_db()
+# Initialize databases
+try:
+    init_all_databases()
+    logger.info("Databases initialized successfully")
+except Exception as e:
+    logger.error(f"Error initializing databases: {e}")
+    raise
 
 # Cache for frequently accessed data
 @lru_cache(maxsize=100)
