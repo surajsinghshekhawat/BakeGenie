@@ -1,0 +1,715 @@
+{% extends "layout.html" %} {% block title %}Real-time Ingredient Measurement{%
+endblock %} {% block head %}
+<style>
+  .measure-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .measure-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: linear-gradient(
+      135deg,
+      var(--background-color) 0%,
+      #ffffff 100%
+    );
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .measure-header h1 {
+    color: var(--primary-color);
+    font-size: 2.8rem;
+    margin-bottom: 20px;
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: slideDown 0.5s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .measure-header p {
+    color: var(--text-light);
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+    animation: slideUp 0.5s ease-out 0.2s backwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .measure-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    animation: fadeIn 0.5s ease-out 0.3s backwards;
+  }
+
+  .camera-section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .camera-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .camera-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .select-wrapper {
+    flex: 1;
+    position: relative;
+  }
+
+  .select-wrapper::after {
+    content: "▼";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    pointer-events: none;
+  }
+
+  .select-wrapper select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: white;
+    appearance: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .select-wrapper select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(109, 76, 65, 0.1);
+    outline: none;
+  }
+
+  .camera-view {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  #camera-feed {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .camera-view:hover #camera-feed {
+    transform: scale(1.02);
+  }
+
+  .detection-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .measurement-info {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .info-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+  }
+
+  .info-item:hover {
+    transform: translateY(-3px);
+  }
+
+  .info-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 5px;
+  }
+
+  .info-value {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .camera-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .camera-button {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .start-camera {
+    background: var(--primary-color);
+    color: white;
+  }
+
+  .start-camera:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .stop-camera {
+    background: var(--error-color);
+    color: white;
+    display: none;
+  }
+
+  .stop-camera:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .results-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .results-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .results-section h2 {
+    color: var(--text-color);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+
+  .average-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-align: center;
+    margin: 20px 0;
+    transition: all 0.3s ease;
+  }
+
+  .average-value.highlight {
+    animation: pulse 0.5s ease-in-out;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .instruction-box {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    animation: slideUp 0.5s ease-out 0.4s backwards;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .instruction-box h3 {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(109, 76, 65, 0.1);
+  }
+
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .tip-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: var(--background-color);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .tip-item:hover {
+    transform: translateY(-5px);
+    background: #f8f9fa;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .tip-item i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+    background: rgba(109, 76, 65, 0.1);
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .tip-item:hover i {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(109, 76, 65, 0.2);
+  }
+
+  .tip-item p {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .measurement-history {
+    margin-top: 30px;
+  }
+
+  .history-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+  }
+
+  .history-details {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .history-ingredient {
+    font-weight: 600;
+  }
+
+  .history-measurement {
+    color: #666;
+  }
+
+  .history-time {
+    color: #999;
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
+  @media (max-width: 992px) {
+    .measure-content {
+      grid-template-columns: 1fr;
+    }
+
+    .measure-header h1 {
+      font-size: 2.2rem;
+    }
+
+    .camera-controls {
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="measure-container">
+  <!-- Original Header -->
+  <div class="measure-header">
+    <h1>Smart Ingredient Measurement</h1>
+    <p>
+      BakeGenie's AI-powered measurement system helps you measure ingredients
+      with precision. Simply select your ingredient and container type, then
+      show it to the camera for instant measurements.
+    </p>
+  </div>
+
+  <!-- Instruction Box -->
+  <div class="instruction-box">
+    <h3><i class="fas fa-lightbulb"></i> Tips for Accurate Measurements</h3>
+    <div class="tips-grid">
+      <div class="tip-item">
+        <i class="fas fa-box"></i>
+        <p>Use non-reflective containers for better detection</p>
+      </div>
+      <div class="tip-item">
+        <i class="fas fa-lightbulb"></i>
+        <p>Ensure consistent, even lighting</p>
+      </div>
+      <div class="tip-item">
+        <i class="fas fa-balance-scale"></i>
+        <p>Keep the container level and steady</p>
+      </div>
+      <div class="tip-item">
+        <i class="fas fa-sun"></i>
+        <p>Avoid direct sunlight or harsh shadows</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="measure-content">
+    <div class="camera-section">
+      <div class="camera-controls">
+        <div class="select-wrapper">
+          <select id="ingredient-select">
+            <option value="">Select Ingredient</option>
+            {% for ingredient in ingredients %}
+            <option value="{{ ingredient }}">{{ ingredient }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="select-wrapper">
+          <select id="measurement-select">
+            <option value="">Select Measurement Tool</option>
+            <option value="small_cup">Small Cup (240ml)</option>
+            <option value="large_cup">Large Cup (480ml)</option>
+            <option value="mixing_bowl">Mixing Bowl (1000ml)</option>
+            <option value="small_spoon">Small Spoon (5ml)</option>
+            <option value="tablespoon">Tablespoon (15ml)</option>
+            <option value="teaspoon">Teaspoon (5ml)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="camera-view">
+        <video id="camera-feed" autoplay playsinline></video>
+        <canvas class="detection-overlay"></canvas>
+      </div>
+
+      <div class="measurement-info" style="display: none">
+        <h3>Measurement Details</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Volume</div>
+            <div class="info-value" id="volume-value">-</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Weight</div>
+            <div class="info-value" id="weight-value">-</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Confidence</div>
+            <div class="info-value" id="confidence-value">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="camera-buttons">
+        <button class="camera-button start-camera" id="start-camera">
+          <i class="fas fa-camera"></i>
+          Start Camera
+        </button>
+        <button class="camera-button stop-camera" id="stop-camera">
+          <i class="fas fa-stop"></i>
+          Stop Camera
+        </button>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <h2>Measurement Results</h2>
+      <div class="average-value" id="averageValue">0.00</div>
+      <div id="measurementList" class="measurement-history"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let measurements = [];
+  let stream = null;
+  let processingFrame = false;
+  let lastProcessedTime = 0;
+  const PROCESS_INTERVAL = 500; // Minimum time between processing frames (in ms)
+
+  // Function to calculate average
+  function calculateAverage() {
+    if (measurements.length === 0) return 0;
+    const sum = measurements.reduce((a, b) => a + b, 0);
+    return (sum / measurements.length).toFixed(2);
+  }
+
+  // Function to update average display
+  function updateAverage() {
+    const avg = calculateAverage();
+    document.getElementById("averageValue").textContent = avg;
+    document.getElementById("averageValue").classList.add("highlight");
+    setTimeout(
+      () =>
+        document.getElementById("averageValue").classList.remove("highlight"),
+      500
+    );
+  }
+
+  async function startCamera() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+      });
+
+      const video = document.getElementById("camera-feed");
+      video.srcObject = stream;
+      video.style.display = "block";
+
+      document.getElementById("start-camera").style.display = "none";
+      document.getElementById("stop-camera").style.display = "flex";
+
+      // Start processing frames
+      requestAnimationFrame(processVideoFrame);
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+      alert(
+        "Error accessing camera. Please make sure you have granted camera permissions."
+      );
+    }
+  }
+
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      stream = null;
+
+      const video = document.getElementById("camera-feed");
+      video.srcObject = null;
+      video.style.display = "none";
+
+      document.getElementById("start-camera").style.display = "flex";
+      document.getElementById("stop-camera").style.display = "none";
+      document.querySelector(".measurement-info").style.display = "none";
+    }
+  }
+
+  async function processVideoFrame() {
+    if (!stream || processingFrame) {
+      if (stream) {
+        requestAnimationFrame(processVideoFrame);
+      }
+      return;
+    }
+
+    const currentTime = Date.now();
+    if (currentTime - lastProcessedTime < PROCESS_INTERVAL) {
+      requestAnimationFrame(processVideoFrame);
+      return;
+    }
+
+    processingFrame = true;
+    lastProcessedTime = currentTime;
+
+    try {
+      const video = document.getElementById("camera-feed");
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0);
+
+      const imageData = canvas.toDataURL("image/jpeg", 0.8);
+      const ingredient = document.getElementById("ingredient-select").value;
+      const measurement = document.getElementById("measurement-select").value;
+
+      if (ingredient && measurement) {
+        const response = await fetch("/api/process_image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            image: imageData,
+            ingredient: ingredient,
+            measurement_type: measurement,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        updateMeasurementDisplay(result);
+      }
+    } catch (error) {
+      console.error("Error processing frame:", error);
+    } finally {
+      processingFrame = false;
+      if (stream) {
+        requestAnimationFrame(processVideoFrame);
+      }
+    }
+  }
+
+  function updateMeasurementDisplay(result) {
+    const infoPanel = document.querySelector(".measurement-info");
+
+    if (result.success) {
+      infoPanel.style.display = "block";
+      document.getElementById(
+        "volume-value"
+      ).textContent = `${result.volume_ml} ml`;
+      document.getElementById(
+        "weight-value"
+      ).textContent = `${result.weight_g} g`;
+      document.getElementById(
+        "confidence-value"
+      ).textContent = `${result.confidence}%`;
+
+      // Add to measurements array
+      measurements.push(result.weight_g);
+      updateAverage();
+
+      // Update detection overlay
+      if (result.debug_image) {
+        const overlay = document.querySelector(".detection-overlay");
+        const ctx = overlay.getContext("2d");
+        const img = new Image();
+        img.onload = () => {
+          overlay.width = img.width;
+          overlay.height = img.height;
+          ctx.drawImage(img, 0, 0);
+        };
+        img.src = result.debug_image;
+      }
+
+      // Add to history
+      addToHistory({
+        ingredient: document.getElementById("ingredient-select").value,
+        volume: result.volume_ml,
+        weight: result.weight_g,
+        timestamp: new Date().toLocaleTimeString(),
+      });
+    } else {
+      if (
+        result.message &&
+        result.message.includes("No measuring tools detected")
+      ) {
+        infoPanel.style.display = "none";
+      }
+    }
+  }
+
+  function addToHistory(measurement) {
+    const historyContainer = document.getElementById("measurementList");
+    const historyItem = document.createElement("div");
+    historyItem.className = "history-item";
+    historyItem.innerHTML = `
+      <div class="history-details">
+        <span class="history-ingredient">${measurement.ingredient}</span>
+        <span class="history-measurement">${measurement.volume}ml / ${measurement.weight}g</span>
+        <span class="history-time">${measurement.timestamp}</span>
+      </div>
+    `;
+    historyContainer.insertBefore(historyItem, historyContainer.firstChild);
+  }
+
+  // Event Listeners
+  document
+    .getElementById("start-camera")
+    .addEventListener("click", startCamera);
+  document.getElementById("stop-camera").addEventListener("click", stopCamera);
+
+  // Clean up on page unload
+  window.addEventListener("beforeunload", () => {
+    if (stream) {
+      stopCamera();
+    }
+  });
+</script>
+{% endblock %}

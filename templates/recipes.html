@@ -1,0 +1,308 @@
+{% extends "layout.html" %} {% block title %}Recipes{% endblock %} {% block head
+%}
+<style>
+  /* Remove the recipe-actions styles since we don't need them anymore */
+  .recipes-header h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .search-filter input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-family: var(--font-family);
+    font-size: 1rem;
+  }
+
+  .search-filter input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(109, 76, 65, 0.1);
+    outline: none;
+  }
+
+  .search-filter i {
+    color: var(--primary-color);
+  }
+
+  .filter-button,
+  .diet-button {
+    padding: 0.5rem 1rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+  }
+
+  .filter-button:hover,
+  .filter-button.active,
+  .diet-button:hover,
+  .diet-button.active {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    border-color: transparent;
+    color: white;
+  }
+
+  .recipe-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+
+  .recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(109, 76, 65, 0.15);
+  }
+
+  .recipe-content h3 {
+    color: var(--text-color);
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.2rem;
+  }
+
+  .ingredient-pill {
+    padding: 2px 8px;
+    background-color: var(--background-color);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--text-light);
+  }
+
+  .empty-results {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--text-light);
+  }
+
+  .empty-icon {
+    color: var(--primary-color);
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+  }
+</style>
+{% endblock %} {% block content %}
+<section class="recipes-container">
+  <div class="recipes-header">
+    <h1>Baking Recipes</h1>
+    <p>Discover delicious recipes to try with precise measurements</p>
+  </div>
+
+  <div class="recipes-filters">
+    <div class="search-filter">
+      <input type="text" id="recipe-search" placeholder="Search recipes..." />
+      <i class="fas fa-search"></i>
+    </div>
+
+    <div class="filter-options">
+      <div class="filter-group">
+        <label>Difficulty:</label>
+        <div class="filter-buttons" id="difficulty-filter">
+          <button class="filter-button active" data-filter="all">All</button>
+          <button class="filter-button" data-filter="easy">Easy</button>
+          <button class="filter-button" data-filter="medium">Medium</button>
+          <button class="filter-button" data-filter="hard">Hard</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Dietary:</label>
+        <div class="diet-toggle">
+          <button class="diet-button active" data-filter="all">All</button>
+          <button class="diet-button" data-filter="vegetarian">
+            Vegetarian
+          </button>
+          <button class="diet-button" data-filter="non-vegetarian">
+            Non-Vegetarian
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="recipes-grid" id="recipes-grid">
+    {% for recipe in recipes %}
+    <div
+      class="recipe-card"
+      data-difficulty="{{ recipe.difficulty|lower }}"
+      data-dietary="{{ recipe.dietary|lower }}"
+      data-name="{{ recipe.name|lower }}"
+    >
+      <a href="/recipe/{{ recipe.id }}">
+        <div class="recipe-image">
+          <img
+            src="{{ recipe.image_path }}"
+            alt="{{ recipe.name }}"
+            data-fallback="{{ url_for('static', filename='images/recipes/default.jpg') }}"
+          />
+          <div class="recipe-badge {{ recipe.dietary|lower }}">
+            {{ recipe.dietary }}
+          </div>
+        </div>
+        <div class="recipe-content">
+          <h3>{{ recipe.name }}</h3>
+          <div class="recipe-meta">
+            <span class="difficulty {{ recipe.difficulty|lower }}"
+              >{{ recipe.difficulty|capitalize }}</span
+            >
+            <span class="prep-time">{{ recipe.prep_time }} mins</span>
+            <span class="servings">{{ recipe.serving_size }} servings</span>
+          </div>
+          <p class="recipe-ingredients">
+            {% set unique_ingredients = {} %} {% for ingredient in
+            recipe.ingredients %} {% if ingredient.name not in
+            unique_ingredients %} {% if loop.index <= 3 %}
+            <span class="ingredient-pill">{{ ingredient.name }}</span>
+            {% endif %} {% set _ = unique_ingredients.update({ingredient.name:
+            true}) %} {% endif %} {% endfor %} {% if unique_ingredients|length >
+            3 %}
+            <span class="more">+{{ unique_ingredients|length - 3 }} more</span>
+            {% endif %}
+          </p>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="empty-state" id="empty-results" style="display: none">
+    <div class="empty-icon">
+      <i class="fas fa-search"></i>
+    </div>
+    <h3>No recipes found</h3>
+    <p>Try adjusting your search or filters to find what you're looking for.</p>
+  </div>
+</section>
+{% endblock %} {% block styles %}
+<style>
+  .recipe-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .recipe-card.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .loading-spinner {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ff6b6b;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Handle image fallback
+    document.querySelectorAll("img[data-fallback]").forEach((img) => {
+      img.onerror = function () {
+        this.src = this.dataset.fallback;
+      };
+    });
+
+    const recipeCards = document.querySelectorAll(".recipe-card");
+    const recipesGrid = document.getElementById("recipes-grid");
+    const emptyResults = document.getElementById("empty-results");
+    const searchInput = document.getElementById("recipe-search");
+    const difficultyButtons = document.querySelectorAll(
+      "#difficulty-filter .filter-button"
+    );
+    const dietButtons = document.querySelectorAll(".diet-button");
+
+    let filters = {
+      search: "",
+      difficulty: "all",
+      dietary: "all",
+    };
+
+    // Search functionality
+    searchInput.addEventListener("input", function (e) {
+      filters.search = e.target.value.toLowerCase().trim();
+      applyFilters();
+    });
+
+    // Difficulty filter
+    difficultyButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        difficultyButtons.forEach((btn) => btn.classList.remove("active"));
+        this.classList.add("active");
+        filters.difficulty = this.getAttribute("data-filter").toLowerCase();
+        applyFilters();
+      });
+    });
+
+    // Dietary filter
+    dietButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        dietButtons.forEach((btn) => btn.classList.remove("active"));
+        this.classList.add("active");
+        filters.dietary = this.getAttribute("data-filter").toLowerCase();
+        applyFilters();
+      });
+    });
+
+    function applyFilters() {
+      let visibleCount = 0;
+
+      recipeCards.forEach((card) => {
+        const name = card.getAttribute("data-name");
+        const difficulty = card.getAttribute("data-difficulty");
+        const dietary = card.getAttribute("data-dietary");
+
+        // Check if the card matches all filter criteria
+        const matchesSearch =
+          filters.search === "" || name.includes(filters.search);
+        const matchesDifficulty =
+          filters.difficulty === "all" || difficulty === filters.difficulty;
+        const matchesDietary =
+          filters.dietary === "all" || dietary === filters.dietary;
+
+        if (matchesSearch && matchesDifficulty && matchesDietary) {
+          card.style.display = "";
+          visibleCount++;
+        } else {
+          card.style.display = "none";
+        }
+      });
+
+      // Show/hide empty state
+      if (visibleCount === 0) {
+        recipesGrid.style.display = "none";
+        emptyResults.style.display = "flex";
+      } else {
+        recipesGrid.style.display = "grid";
+        emptyResults.style.display = "none";
+      }
+    }
+  });
+</script>
+{% endblock %}

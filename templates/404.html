@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-code">404</div>
+    <div class="error-message">Oops! We couldn't find that recipe.</div>
+    <p>The page you're looking for might have been removed, renamed, or is temporarily unavailable.</p>
+    <div class="error-actions">
+        <a href="/" class="btn btn-primary">
+            <i class="fas fa-home"></i> Go Home
+        </a>
+        <a href="/recipes" class="btn btn-secondary">
+            <i class="fas fa-utensils"></i> Browse Recipes
+        </a>
+    </div>
+</div>
+{% endblock %}
+

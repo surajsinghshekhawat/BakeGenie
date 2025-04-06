@@ -1,0 +1,37 @@
+{% extends "layout.html" %} {% block title %}Adjusted Recipe{% endblock %} {%
+block content %} {% set unique_ingredients = {} %}
+<div class="recipe-content">
+  <div class="ingredients-section">
+    <h2>Adjusted Ingredients</h2>
+    <ul class="ingredients-list">
+      {% for ingredient in recipe.ingredients %} {% set ing_key =
+      ingredient.name|lower %} {% if ing_key not in unique_ingredients %} {% set
+      amount = ingredient.get('amount', '') %} {% set unit =
+      ingredient.get('unit', '') %}
+      <li>
+        <span class="ingredient-amount">
+          {% if amount %} {% set adjusted = amount|float * adjustment_factor %}
+          {% if adjusted < 1 %} {{ "%.2f"|format(adjusted) }} {% else %} {{
+          "%.1f"|format(adjusted) }} {% endif %} {{ unit }} {% else %} As needed
+          {% endif %}
+        </span>
+        <span class="ingredient-name">{{ ingredient.name }}</span>
+      </li>
+      {% set _ = unique_ingredients.update({ing_key: ingredient}) %} {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="instructions-section">
+    <h2>Instructions</h2>
+    <ol class="instructions-list">
+      {% if recipe.instructions is string %} {% for step in
+      recipe.instructions.split('\n') %} {% if step.strip() %}
+      <li>{{ step.strip() }}</li>
+      {% endif %} {% endfor %} {% else %} {% for step in recipe.instructions %}
+      <li>{{ step }}</li>
+      {% endfor %} {% endif %}
+    </ol>
+  </div>
+</div>
+{% endblock %}

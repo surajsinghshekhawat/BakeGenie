@@ -1,0 +1,593 @@
+{% extends "layout.html" %} {% block title %}{{ recipe.name }}{% endblock %} {%
+block head %}
+<style>
+  .recipe-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .recipe-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: linear-gradient(
+      135deg,
+      var(--background-color) 0%,
+      #ffffff 100%
+    );
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    animation: slideDown 0.6s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .recipe-title {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .recipe-title h1 {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+  }
+
+  .recipe-description {
+    color: #666;
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+    animation: slideUp 0.6s ease-out 0.2s backwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .recipe-meta {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+    animation: slideUp 0.6s ease-out 0.4s backwards;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .meta-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .meta-item i {
+    margin-right: 8px;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+  }
+
+  .recipe-image {
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    margin: 0 auto 40px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    animation: zoomIn 0.8s ease-out 0.6s backwards;
+  }
+
+  @keyframes zoomIn {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .recipe-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .recipe-image:hover img {
+    transform: scale(1.05);
+  }
+
+  .recipe-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px;
+    margin-bottom: 40px;
+    animation: fadeIn 0.8s ease-out 0.8s backwards;
+  }
+
+  .recipe-sidebar,
+  .recipe-main {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .recipe-sidebar:hover,
+  .recipe-main:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--primary-color);
+    position: relative;
+  }
+
+  .section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: var(--secondary-color);
+  }
+
+  .ingredients-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ingredient-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+  }
+
+  .ingredient-item:hover {
+    background: #f8f9fa;
+    transform: translateX(5px);
+  }
+
+  .ingredient-amount {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .ingredient-notes {
+    font-size: 0.9rem;
+    color: #888;
+    margin-top: 5px;
+  }
+
+  .ingredient-substitute {
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    margin-top: 5px;
+  }
+
+  .instructions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: step;
+  }
+
+  .instruction-item {
+    position: relative;
+    padding: 20px 0 20px 50px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .instruction-item:last-child {
+    border-bottom: none;
+  }
+
+  .instruction-item::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 20px;
+    width: 30px;
+    height: 30px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  .nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .nutrition-item {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff 0%, var(--background-color) 100%);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .nutrition-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .nutrition-value {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+  }
+
+  .nutrition-label {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .recipe-tips {
+    margin-top: 40px;
+    padding: 25px;
+    background: linear-gradient(135deg, #fff8f8 0%, #fff 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+
+  .tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tip-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .tip-item:hover {
+    background: white;
+    transform: translateX(5px);
+  }
+
+  .tip-item i {
+    color: var(--primary-color);
+    margin-right: 12px;
+    margin-top: 3px;
+    font-size: 1.2rem;
+  }
+
+  .equipment-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .equipment-item {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: #666;
+    transition: all 0.3s ease;
+  }
+
+  .equipment-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .storage-instructions {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0f7ff 0%, #fff 100%);
+    border-radius: 12px;
+    color: #2c5282;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+
+  .recipe-source {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .recipe-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #f39c12;
+  }
+
+  .recipe-rating .stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .recipe-rating .count {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .adjust-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 25px;
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(109, 76, 65, 0.2);
+  }
+
+  .adjust-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(109, 76, 65, 0.3);
+    background: linear-gradient(
+      135deg,
+      var(--secondary-color),
+      var(--primary-color)
+    );
+  }
+
+  .adjust-button i {
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 768px) {
+    .recipe-content {
+      grid-template-columns: 1fr;
+    }
+
+    .recipe-image {
+      height: 300px;
+    }
+
+    .recipe-title {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="recipe-container">
+  <div class="recipe-header">
+    <div class="recipe-title">
+      <h1>{{ recipe.name }}</h1>
+      <a href="/adjust?recipe_id={{ recipe.id }}" class="adjust-button">
+        <i class="fas fa-sliders-h"></i>
+        Adjust Recipe
+      </a>
+    </div>
+    <p class="recipe-description">{{ recipe.description }}</p>
+
+    <div class="recipe-meta">
+      <div class="meta-item">
+        <i class="fas fa-clock"></i>
+        Prep: {{ recipe.prep_time }}m
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-fire"></i>
+        Cook: {{ recipe.cook_time }}m
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-hourglass-half"></i>
+        Total: {{ recipe.total_time }}m
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-users"></i>
+        Serves: {{ recipe.serving_size }}
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-chart-line"></i>
+        {{ recipe.difficulty|capitalize }}
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-utensils"></i>
+        {{ recipe.cuisine_type }}
+      </div>
+      <div class="meta-item recipe-rating">
+        <div class="stars">
+          {% for i in range(5) %} {% if i < recipe.rating|int %}
+          <i class="fas fa-star"></i>
+          {% elif i < recipe.rating %}
+          <i class="fas fa-star-half-alt"></i>
+          {% else %}
+          <i class="far fa-star"></i>
+          {% endif %} {% endfor %}
+        </div>
+        <span class="count">({{ recipe.review_count }})</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="recipe-image">
+    <img src="{{ recipe.image_path }}" alt="{{ recipe.name }}" />
+  </div>
+
+  <div class="recipe-content">
+    <div class="recipe-sidebar">
+      <h2 class="section-title">Ingredients</h2>
+      <ul class="ingredients-list">
+        {% for ingredient in recipe.ingredients %}
+        <li class="ingredient-item">
+          <div class="ingredient-details">
+            <div class="ingredient-name">
+              {{ ingredient.ingredient_name }} {% if ingredient.is_optional %}
+              <span class="optional">(optional)</span>
+              {% endif %}
+            </div>
+            <div class="ingredient-amount">
+              {{ ingredient.amount }} {{ ingredient.unit }}
+            </div>
+            {% if ingredient.notes %}
+            <div class="ingredient-notes">{{ ingredient.notes }}</div>
+            {% endif %} {% if ingredient.substitute %}
+            <div class="ingredient-substitute">
+              <i class="fas fa-exchange-alt"></i> Substitute: {{
+              ingredient.substitute }}
+            </div>
+            {% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <div class="nutrition-info">
+        <h2 class="section-title">Nutrition</h2>
+        <div class="nutrition-grid">
+          <div class="nutrition-item">
+            <div class="nutrition-value">{{ recipe.calories }}</div>
+            <div class="nutrition-label">Calories</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-value">{{ recipe.protein }}g</div>
+            <div class="nutrition-label">Protein</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-value">{{ recipe.carbs }}g</div>
+            <div class="nutrition-label">Carbs</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-value">{{ recipe.fat }}g</div>
+            <div class="nutrition-label">Fat</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-value">{{ recipe.fiber }}g</div>
+            <div class="nutrition-label">Fiber</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-value">{{ recipe.sugar }}g</div>
+            <div class="nutrition-label">Sugar</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="equipment-needed">
+        <h2 class="section-title">Equipment Needed</h2>
+        <div class="equipment-list">
+          {% for item in recipe.equipment_needed.split(', ') %}
+          <div class="equipment-item">
+            <i class="fas fa-utensil-spoon"></i> {{ item }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="recipe-main">
+      <h2 class="section-title">Instructions</h2>
+      <ol class="instructions-list">
+        {% for step in recipe.instructions %}
+        <li class="instruction-item">{{ step }}</li>
+        {% endfor %}
+      </ol>
+
+      <div class="recipe-tips">
+        <h2 class="section-title">Pro Tips</h2>
+        <ul class="tips-list">
+          {% for tip in recipe.tips.split('. ') %} {% if tip.strip() %}
+          <li class="tip-item">
+            <i class="fas fa-lightbulb"></i>
+            <span>{{ tip.strip() }}</span>
+          </li>
+          {% endif %} {% endfor %}
+        </ul>
+      </div>
+
+      <div class="storage-instructions">
+        <i class="fas fa-box"></i>
+        <strong>Storage:</strong> {{ recipe.storage_instructions }}
+      </div>
+
+      <div class="recipe-source">
+        <p>Recipe by {{ recipe.author }} • Source: {{ recipe.source }}</p>
+        <p>Temperature: {{ recipe.temperature }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

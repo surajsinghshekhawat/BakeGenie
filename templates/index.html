@@ -1,0 +1,194 @@
+{% extends "layout.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="animate__animated animate__fadeInDown">
+      Perfect Baking with BakeGenie
+    </h1>
+    <p class="animate__animated animate__fadeInUp animate__delay-1s">
+      Your smart kitchen companion for measuring ingredients, adjusting recipes,
+      and discovering new baking ideas. Experience the future of baking with our
+      AI-powered tools.
+    </p>
+    <div
+      class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s"
+    >
+      <a href="/measure" class="btn btn-primary">
+        <i class="fas fa-camera"></i>
+        Measure Now
+      </a>
+      <a href="/chatbot" class="btn btn-secondary">
+        <i class="fas fa-robot"></i>
+        Recipe Suggestions
+      </a>
+    </div>
+  </div>
+  <div
+    class="hero-image animate__animated animate__fadeInRight animate__delay-3s"
+  >
+    <img
+      src="{{ url_for('static', filename='images/homepage.jpg') }}"
+      alt="Baking illustration"
+    />
+  </div>
+</section>
+
+<section class="features">
+  <h2 class="section-title">What BakeGenie Can Do For You</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-camera"></i>
+      </div>
+      <h3>Smart Measuring</h3>
+      <p>
+        Use your camera to measure ingredients in cups and spoons with precise
+        volume and weight conversion. Our AI technology ensures accurate
+        measurements every time.
+      </p>
+      <a href="/measure" class="feature-link">
+        Measure Ingredients
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-sliders-h"></i>
+      </div>
+      <h3>Recipe Adjustment</h3>
+      <p>
+        Scale recipes for different serving sizes and adjust texture preferences
+        for perfect results every time. Our AI understands baking science to
+        maintain perfect ratios.
+      </p>
+      <a href="/adjust" class="feature-link">
+        Adjust Recipes
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-robot"></i>
+      </div>
+      <h3>AI Recipe Suggestions</h3>
+      <p>
+        Get personalized recipe ideas based on ingredients you already have in
+        your kitchen. Our AI suggests perfect matches to what you have.
+      </p>
+      <a href="/chatbot" class="feature-link">
+        Discover Recipes
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-database"></i>
+      </div>
+      <h3>Ingredient Database</h3>
+      <p>
+        Access detailed information about common baking ingredients including
+        conversions, and substitution suggestions.
+      </p>
+      <a href="/ingredients" class="feature-link">
+        Browse Ingredients
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works">
+  <h2 class="section-title">How It Works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-number">1</div>
+      <h3>Select Your Ingredient</h3>
+      <p>
+        Choose from our extensive ingredient database . Our AI recognizes over
+        100 common baking ingredients. [growing soon]
+      </p>
+    </div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <h3>Measure with Your Camera</h3>
+      <p>
+        Use your phone to measure the ingredient in your cup or spoon for
+        instant Measurement. Our AI provides real-time feedback for accuracy.
+      </p>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <h3>Get Accurate Conversions</h3>
+      <p>
+        Receive precise volume-to-weight conversions based on ingredient
+        density. Our database includes detailed density information for perfect
+        measurements.
+      </p>
+    </div>
+    <div class="step">
+      <div class="step-number">4</div>
+      <h3>Adjust to Your Needs</h3>
+      <p>
+        Scale recipes and modify texture preferences for perfect baking results.
+        BakeGenie ensures all ingredient ratios remain balanced.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="benefits">
+  <h2 class="section-title">Why Choose BakeGenie</h2>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-icon">
+        <i class="fas fa-bolt"></i>
+      </div>
+      <h3>Lightning Fast</h3>
+      <p>
+        Get instant measurements and conversions with our advanced AI
+        technology. No more manual calculations or guesswork.
+      </p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <h3>Precision Baking</h3>
+      <p>
+        Our AI ensures perfect measurements and ratios every time, helping you
+        achieve consistent baking results.
+      </p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h3>Learn as You Bake</h3>
+      <p>
+        Get detailed tips about baking science, helping you become a better
+        baker with each recipe.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-content">
+    <h2>Start Baking Smarter Today</h2>
+    <p>
+      Join BakeGenie to create perfect treats every time. Try it now and
+      experience the difference!
+    </p>
+    <div class="cta-buttons">
+      <a href="/recipes" class="btn btn-primary">
+        <i class="fas fa-book-open"></i>
+        Browse Recipes
+      </a>
+      <a href="/chatbot" class="btn btn-secondary">
+        <i class="fas fa-robot"></i>
+        Ask BakeGenie
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

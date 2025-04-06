@@ -1,0 +1,65 @@
+{% extends "base.html" %} {% block title %}Error{% endblock %} {% block content
+%}
+<div class="error-container">
+  <div class="error-content">
+    <i class="fas fa-exclamation-circle"></i>
+    <h1>Oops!</h1>
+    <p>{{ error }}</p>
+    <a href="{{ url_for('index') }}" class="back-button">
+      <i class="fas fa-home"></i> Back to Home
+    </a>
+  </div>
+</div>
+{% endblock %} {% block head %}
+<style>
+  .error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 20px;
+  }
+
+  .error-content {
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .error-content i {
+    font-size: 4rem;
+    color: #ff6b6b;
+    margin-bottom: 20px;
+  }
+
+  .error-content h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+
+  .error-content p {
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 25px;
+    background-color: #ff6b6b;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .back-button:hover {
+    background-color: #e74c3c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 107, 107, 0.3);
+  }
+</style>
+{% endblock %}

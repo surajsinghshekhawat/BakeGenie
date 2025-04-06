@@ -1,0 +1,1013 @@
+{% extends "layout.html" %} {% block title %}Adjust Recipe{% endblock %} {%
+block head %}
+<style>
+  .adjust-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .adjust-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .adjust-header h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+    animation: slideDown 0.5s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .adjust-header h1::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 2px;
+  }
+
+  .adjust-header p {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: slideUp 0.5s ease-out 0.2s backwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .recipe-selection {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .recipe-selection:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .recipe-selection h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    position: relative;
+    display: inline-block;
+  }
+
+  .recipe-selection h2::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: var(--primary-color);
+  }
+
+  .recipe-search {
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .recipe-search input {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .recipe-search input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(109, 76, 65, 0.1);
+    outline: none;
+  }
+
+  .recipe-search i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+  }
+
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .recipe-card {
+    background-color: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .recipe-card.selected {
+    border: 2px solid var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .recipe-card.selected::after {
+    content: "✓";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 25px;
+    height: 25px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  .recipe-image {
+    height: 150px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .recipe-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .recipe-card:hover .recipe-image img {
+    transform: scale(1.05);
+  }
+
+  .recipe-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+  }
+
+  .recipe-badge.vegetarian {
+    background: linear-gradient(135deg, var(--success-color), #2ecc71);
+  }
+
+  .recipe-badge.non-vegetarian {
+    background: linear-gradient(135deg, var(--error-color), #ff5252);
+  }
+
+  .recipe-details {
+    padding: 20px;
+  }
+
+  .recipe-details h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    line-height: 1.3;
+  }
+
+  .recipe-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-light);
+  }
+
+  .difficulty {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    color: white;
+    font-weight: 600;
+    text-transform: capitalize;
+    font-size: 0.7rem;
+  }
+
+  .difficulty.easy {
+    background: linear-gradient(135deg, var(--success-color), #27ae60);
+  }
+
+  .difficulty.medium {
+    background: linear-gradient(135deg, var(--warning-color), #e67e22);
+  }
+
+  .difficulty.hard {
+    background: linear-gradient(135deg, var(--error-color), #ff5252);
+  }
+
+  .adjustment-form {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-bottom: 30px;
+    display: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .adjustment-form:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .adjustment-form h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    text-align: center;
+  }
+
+  .adjustment-form h2 span {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .form-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 500;
+  }
+
+  .number-input {
+    display: flex;
+    width: 100%;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .number-input button {
+    width: 40px;
+    background-color: var(--background-color);
+    border: none;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .number-input button:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  .number-input input {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border: none;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .number-input input:focus {
+    outline: none;
+  }
+
+  .texture-options {
+    display: flex;
+    gap: 15px;
+  }
+
+  .texture-option {
+    flex: 1;
+    position: relative;
+  }
+
+  .texture-option input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .texture-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background-color: var(--background-color);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .texture-label i {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+  }
+
+  .texture-option input:checked + .texture-label {
+    background-color: rgba(109, 76, 65, 0.1);
+    border-color: var(--primary-color);
+  }
+
+  .texture-option input:checked + .texture-label i {
+    color: var(--primary-color);
+  }
+
+  .calculate-button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(109, 76, 65, 0.2);
+  }
+
+  .calculate-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(109, 76, 65, 0.3);
+    background: var(--primary-dark);
+  }
+
+  .calculate-button i {
+    margin-right: 8px;
+  }
+
+  .results-container {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-bottom: 30px;
+    display: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .results-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .results-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin: 0;
+  }
+
+  .results-meta {
+    display: flex;
+    gap: 15px;
+    color: var(--text-light);
+  }
+
+  .results-meta span {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  .results-meta span i {
+    margin-right: 5px;
+    color: var(--primary-color);
+  }
+
+  .results-ingredients {
+    margin-bottom: 30px;
+  }
+
+  .results-ingredients h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    position: relative;
+    display: inline-block;
+  }
+
+  .results-ingredients h3::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: var(--primary-color);
+  }
+
+  .ingredients-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ingredients-table th,
+  .ingredients-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .ingredients-table th {
+    font-weight: 600;
+    color: var(--text-light);
+    background-color: var(--background-color);
+  }
+
+  .ingredients-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .ingredients-table .adjusted {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .results-notes {
+    margin-bottom: 30px;
+    background-color: rgba(109, 76, 65, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .results-notes h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--text-color);
+  }
+
+  .results-notes ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    color: var(--text-light);
+  }
+
+  .results-notes li {
+    margin-bottom: 8px;
+  }
+
+  .results-actions {
+    display: flex;
+    gap: 15px;
+  }
+
+  .results-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .print-button {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+  }
+
+  .print-button:hover {
+    background-color: var(--border-color);
+  }
+
+  .new-adjustment-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 6px rgba(109, 76, 65, 0.2);
+  }
+
+  .new-adjustment-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(109, 76, 65, 0.3);
+    background: var(--primary-dark);
+  }
+
+  .results-actions button i {
+    margin-right: 5px;
+  }
+
+  .no-recipes {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--background-color);
+    border-radius: 12px;
+    color: var(--text-light);
+  }
+
+  .no-recipes i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+  }
+
+  @media (max-width: 768px) {
+    .form-controls {
+      grid-template-columns: 1fr;
+    }
+
+    .texture-options {
+      flex-direction: column;
+    }
+
+    .results-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .results-meta {
+      margin-top: 10px;
+    }
+
+    .results-actions {
+      flex-direction: column;
+    }
+  }
+
+  @media print {
+    .adjust-header,
+    .recipe-selection,
+    .adjustment-form,
+    .results-actions {
+      display: none !important;
+    }
+
+    .results-container {
+      box-shadow: none;
+      padding: 0;
+    }
+
+    body {
+      font-size: 12pt;
+    }
+
+    h2 {
+      font-size: 16pt;
+    }
+
+    h3 {
+      font-size: 14pt;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="adjust-container">
+  <div class="adjust-header">
+    <h1>Recipe Adjustment Tool</h1>
+    <p>Scale recipes and adjust texture for perfect results every time</p>
+  </div>
+
+  <div class="recipe-selection" id="recipe-selection">
+    <h2>Select a Recipe</h2>
+
+    <div class="recipe-search">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        id="recipe-search"
+        placeholder="Search for a recipe..."
+      />
+    </div>
+
+    <div class="recipe-grid" id="recipe-grid">
+      {% for recipe in recipes %}
+      <div
+        class="recipe-card"
+        data-recipe-id="{{ recipe.id }}"
+        data-recipe-name="{{ recipe.name }}"
+      >
+        <div class="recipe-image">
+          <img src="{{ recipe.image_path }}" alt="{{ recipe.name }}" />
+          <div class="recipe-badge {{ recipe.dietary }}">
+            {{ recipe.dietary }}
+          </div>
+        </div>
+        <div class="recipe-details">
+          <h3>{{ recipe.name }}</h3>
+          <div class="recipe-meta">
+            <span class="difficulty {{ recipe.difficulty }}"
+              >{{ recipe.difficulty|capitalize }}</span
+            >
+            <span class="servings">{{ recipe.serving_size }} servings</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if not recipes %}
+    <div class="no-recipes">
+      <i class="fas fa-cookie-bite"></i>
+      <p>No recipes found. Please try a different search term.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="adjustment-form" id="adjustment-form">
+    <h2>Adjust <span id="recipe-name"></span></h2>
+
+    <div class="form-controls">
+      <div class="form-group">
+        <label for="servings">Number of Servings:</label>
+        <div class="number-input">
+          <button class="decrease">-</button>
+          <input type="number" id="servings" min="1" max="50" value="1" />
+          <button class="increase">+</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Texture Preference:</label>
+        <div class="texture-options">
+          <label class="texture-option">
+            <input type="radio" name="texture" value="normal" checked />
+            <span class="texture-label">
+              <i class="fas fa-check"></i>
+              Normal
+            </span>
+          </label>
+          <label class="texture-option">
+            <input type="radio" name="texture" value="moist" />
+            <span class="texture-label">
+              <i class="fas fa-tint"></i>
+              More Moist
+            </span>
+          </label>
+          <label class="texture-option">
+            <input type="radio" name="texture" value="crispy" />
+            <span class="texture-label">
+              <i class="fas fa-cookie"></i>
+              More Crispy
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <button id="calculate-button" class="calculate-button">
+      <i class="fas fa-calculator"></i> Calculate Adjusted Recipe
+    </button>
+  </div>
+
+  <div class="results-container" id="results-container">
+    <div class="results-header">
+      <h2>Adjusted Recipe</h2>
+      <div class="results-meta">
+        <span id="results-servings"
+          ><i class="fas fa-users"></i> <span></span
+        ></span>
+        <span id="results-texture"
+          ><i class="fas fa-sliders-h"></i> <span></span
+        ></span>
+      </div>
+    </div>
+
+    <div class="results-ingredients">
+      <h3>Ingredients</h3>
+      <table class="ingredients-table">
+        <thead>
+          <tr>
+            <th>Ingredient Name</th>
+            <th>Original Amount</th>
+            <th>Adjusted Amount</th>
+          </tr>
+        </thead>
+        <tbody id="ingredients-results">
+          <!-- Results will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="results-notes">
+      <h3>Baking Notes</h3>
+      <ul id="baking-notes">
+        <!-- Notes will be inserted here -->
+      </ul>
+    </div>
+
+    <div class="results-actions">
+      <button id="print-recipe" class="print-button">
+        <i class="fas fa-print"></i> Print Recipe
+      </button>
+
+      <button id="new-adjustment" class="new-adjustment-button">
+        <i class="fas fa-redo"></i> Adjust Another Recipe
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const recipeSearch = document.getElementById("recipe-search");
+    const recipeGrid = document.getElementById("recipe-grid");
+    const recipeCards = document.querySelectorAll(".recipe-card");
+    const adjustmentForm = document.getElementById("adjustment-form");
+    const recipeName = document.getElementById("recipe-name");
+    const servingsInput = document.getElementById("servings");
+    const calculateButton = document.getElementById("calculate-button");
+    const resultsContainer = document.getElementById("results-container");
+    const resultsServings = document.querySelector("#results-servings span");
+    const resultsTexture = document.querySelector("#results-texture span");
+    const ingredientsResults = document.getElementById("ingredients-results");
+    const bakingNotes = document.getElementById("baking-notes");
+    const printRecipe = document.getElementById("print-recipe");
+    const newAdjustment = document.getElementById("new-adjustment");
+
+    let selectedRecipeId = null;
+
+    // Check if a recipe ID was passed in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const recipeIdParam = urlParams.get("recipe_id");
+
+    if (recipeIdParam) {
+      const recipeCard = document.querySelector(
+        `.recipe-card[data-recipe-id="${recipeIdParam}"]`
+      );
+      if (recipeCard) {
+        selectRecipe(recipeCard);
+      }
+    }
+
+    // Recipe search functionality
+    recipeSearch.addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+
+      recipeCards.forEach((card) => {
+        const recipeName = card.getAttribute("data-recipe-name").toLowerCase();
+
+        if (recipeName.includes(searchTerm)) {
+          card.style.display = "";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+
+    // Recipe selection
+    recipeCards.forEach((card) => {
+      card.addEventListener("click", function () {
+        selectRecipe(this);
+      });
+    });
+
+    function selectRecipe(card) {
+      // Remove selection from all cards
+      recipeCards.forEach((c) => c.classList.remove("selected"));
+
+      // Add selection to this card
+      card.classList.add("selected");
+
+      // Get recipe details
+      selectedRecipeId = card.getAttribute("data-recipe-id");
+      const recipeNameText = card.getAttribute("data-recipe-name");
+
+      // Update form with recipe name
+      recipeName.textContent = recipeNameText;
+
+      // Set default servings value from the card
+      const originalServings = card
+        .querySelector(".servings")
+        .textContent.split(" ")[0];
+      servingsInput.value = originalServings;
+
+      // Show adjustment form
+      adjustmentForm.style.display = "block";
+
+      // Scroll to adjustment form
+      adjustmentForm.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Servings increment/decrement
+    document.querySelector(".decrease").addEventListener("click", function () {
+      if (servingsInput.value > 1) {
+        servingsInput.value = parseInt(servingsInput.value) - 1;
+      }
+    });
+
+    document.querySelector(".increase").addEventListener("click", function () {
+      if (servingsInput.value < 50) {
+        servingsInput.value = parseInt(servingsInput.value) + 1;
+      }
+    });
+
+    // Calculate adjusted recipe
+    calculateButton.addEventListener("click", async function () {
+      if (!selectedRecipeId) {
+        alert("Please select a recipe first");
+        return;
+      }
+
+      const servings = servingsInput.value;
+      const texture = document.querySelector(
+        'input[name="texture"]:checked'
+      ).value;
+
+      try {
+        const response = await fetch("/api/adjust_recipe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            recipe_id: parseInt(selectedRecipeId),
+            servings: parseInt(servings),
+            texture: texture,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.message || "An error occurred while adjusting the recipe"
+          );
+        }
+
+        if (result.success) {
+          displayResults(result);
+        } else {
+          throw new Error(result.message || "Failed to adjust recipe");
+        }
+      } catch (err) {
+        console.error("Error adjusting recipe:", err);
+        alert(err.message || "An error occurred while adjusting the recipe");
+      }
+    });
+
+    // Display adjustment results
+    function displayResults(data) {
+      // Set meta information
+      resultsServings.textContent = `${data.adjusted_servings} Servings`;
+
+      let textureLabel;
+      switch (data.texture) {
+        case "moist":
+          textureLabel = "More Moist";
+          break;
+        case "crispy":
+          textureLabel = "More Crispy";
+          break;
+        default:
+          textureLabel = "Normal Texture";
+      }
+      resultsTexture.textContent = textureLabel;
+
+      // Generate ingredients table
+      ingredientsResults.innerHTML = "";
+      data.adjusted_ingredients.forEach((ingredient) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                    <td>${ingredient.name}</td>
+                    <td>${ingredient.original_amount}</td>
+                    <td class="adjusted">${ingredient.adjusted_amount}</td>
+                `;
+        ingredientsResults.appendChild(row);
+      });
+
+      // Generate baking notes
+      bakingNotes.innerHTML = "";
+      const notes = [
+        {
+          condition: data.texture !== "normal",
+          text: `This recipe has been adjusted for ${textureLabel.toLowerCase()} texture.`,
+        },
+        {
+          condition: data.adjusted_servings > data.original_servings,
+          text: `You may need to use a larger baking dish for this increased quantity.`,
+        },
+        {
+          condition: data.adjusted_servings !== data.original_servings,
+          text: `Baking time may need to be adjusted slightly. Check for doneness a few minutes earlier or later than the original recipe.`,
+        },
+      ];
+
+      notes.forEach((note) => {
+        if (note.condition) {
+          const li = document.createElement("li");
+          li.textContent = note.text;
+          bakingNotes.appendChild(li);
+        }
+      });
+
+      // Add a general note about precision
+      const precisionNote = document.createElement("li");
+      precisionNote.textContent =
+        "For best results, use a kitchen scale for precise measurements.";
+      bakingNotes.appendChild(precisionNote);
+
+      // Show results container
+      resultsContainer.style.display = "block";
+      resultsContainer.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Print recipe
+    printRecipe.addEventListener("click", function () {
+      window.print();
+    });
+
+    // New adjustment
+    newAdjustment.addEventListener("click", function () {
+      // Reset selection
+      recipeCards.forEach((c) => c.classList.remove("selected"));
+      selectedRecipeId = null;
+
+      // Hide results and form
+      resultsContainer.style.display = "none";
+      adjustmentForm.style.display = "none";
+
+      // Scroll to top
+      document
+        .querySelector(".recipe-selection")
+        .scrollIntoView({ behavior: "smooth" });
+    });
+  });
+</script>
+{% endblock %}

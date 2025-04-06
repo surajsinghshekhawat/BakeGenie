@@ -1,0 +1,818 @@
+{% extends "layout.html" %} {% block title %}Recipe Chatbot{% endblock %} {%
+block content %}
+<div class="chat-container">
+  <div class="chat-header">
+    <h1>🧑‍🍳 Recipe Assistant</h1>
+    <p>Tell me your ingredients, and I'll suggest delicious recipes!</p>
+  </div>
+
+  <div class="chat-messages" id="chat-messages">
+    <div class="message system">
+      <div class="message-content">
+        <p>👋 Hello! I'm your recipe assistant. I can help you:</p>
+        <ul>
+          <li>Find recipes based on your ingredients</li>
+          <li>Adjust serving sizes</li>
+          <li>Suggest alternatives if you're missing ingredients</li>
+        </ul>
+        <p>Let's start cooking! Add your ingredients below.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-input-container">
+    <div class="input-container">
+      <div class="ingredients-section">
+        <div class="ingredients-input">
+          <input
+            type="text"
+            id="ingredient-input"
+            placeholder="🥕 Type ingredient & press Enter"
+            autocomplete="off"
+          />
+        </div>
+        <div id="ingredients-list" class="ingredients-list"></div>
+      </div>
+
+      <div class="controls-section">
+        <div class="servings-input">
+          <label for="servings">👥 Servings:</label>
+          <input type="number" id="servings" min="1" value="4" max="12" />
+        </div>
+        <button
+          id="get-recipes-btn"
+          onclick="getRecipes()"
+          class="send-button"
+          disabled
+        >
+          <span class="button-text">Find Recipes</span>
+          <div class="button-loader"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="recipes-container" class="recipes-container"></div>
+</div>
+
+<style>
+  .chat-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    opacity: 0;
+    animation: containerFadeIn 0.8s ease-out forwards;
+  }
+
+  .chat-header {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    color: white;
+    padding: 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chat-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(255,255,255,0.1)' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.1;
+    animation: patternMove 20s linear infinite;
+  }
+
+  @keyframes patternMove {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(100px, 100px);
+    }
+  }
+
+  .chat-header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    position: relative;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: titlePopIn 0.6s ease-out 0.3s backwards;
+  }
+
+  .chat-header p {
+    margin: 1rem 0 0;
+    opacity: 0.9;
+    font-size: 1.2rem;
+    position: relative;
+    animation: subtitleFadeIn 0.6s ease-out 0.5s backwards;
+  }
+
+  .chat-messages {
+    padding: 2rem;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    animation: slideIn 0.5s ease-out;
+  }
+
+  .message {
+    margin-bottom: 1.5rem;
+    padding: 1.2rem;
+    border-radius: 16px;
+    max-width: 85%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    animation: messageSlideIn 0.4s ease-out forwards;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .message::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0)
+    );
+    pointer-events: none;
+  }
+
+  .message.system {
+    background: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+    margin-right: auto;
+  }
+
+  .message.system ul {
+    margin: 0.8rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .message.system li {
+    margin: 0.4rem 0;
+    color: #555;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+
+  .message.system li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+  }
+
+  .chat-input-container {
+    padding: 1.5rem;
+    border-top: 1px solid #eee;
+    background: #f8f9fa;
+    position: relative;
+  }
+
+  .chat-input-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--primary-color),
+      transparent
+    );
+  }
+
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .ingredients-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .ingredients-input input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .ingredients-input input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+    outline: none;
+  }
+
+  .controls-section {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .servings-input {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+  }
+
+  .servings-input:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+  }
+
+  .servings-input label {
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .servings-input input {
+    width: 60px;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .send-button {
+    flex: 1;
+    padding: 1rem;
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .send-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+  }
+
+  .send-button:disabled {
+    background: #ced4da;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .button-loader {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .ingredients-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    min-height: 2rem;
+    padding: 0.5rem;
+  }
+
+  .ingredient-tag {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 2px 6px rgba(255, 107, 107, 0.2);
+    opacity: 0;
+    animation: tagPopIn 0.3s ease-out forwards;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ingredient-tag::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0)
+    );
+  }
+
+  .ingredient-tag button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .ingredient-tag button:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .recipes-container {
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .recipe-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    animation: recipeSlideUp 0.4s ease-out forwards;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .recipe-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+  }
+
+  .recipe-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .recipe-card h3 {
+    margin: 0 0 1rem;
+    color: #333;
+    font-size: 1.6rem;
+    font-weight: 700;
+    position: relative;
+  }
+
+  .recipe-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+  }
+
+  .recipe-metadata span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.95rem;
+  }
+
+  .recipe-section {
+    margin: 1.5rem 0;
+  }
+
+  .recipe-section h4 {
+    color: #444;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .recipe-ingredients {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .recipe-ingredients li {
+    background: #f8f9fa;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #495057;
+    transition: all 0.3s ease;
+  }
+
+  .recipe-ingredients li:hover {
+    background: #e9ecef;
+    transform: translateX(4px);
+  }
+
+  .recipe-instructions {
+    counter-reset: step;
+  }
+
+  .recipe-instructions li {
+    position: relative;
+    margin-bottom: 1rem;
+    padding-left: 2.5rem;
+    color: #495057;
+    line-height: 1.6;
+  }
+
+  .recipe-instructions li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .missing-ingredients {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #fff3cd;
+    border-radius: 12px;
+    border: 1px solid #ffeeba;
+  }
+
+  .missing-ingredients h4 {
+    color: #856404;
+    margin-bottom: 0.8rem;
+  }
+
+  .missing-ingredients ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .missing-ingredients li {
+    background: white;
+    color: #856404;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    border: 1px solid #ffeeba;
+  }
+
+  @keyframes containerFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes titlePopIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes subtitleFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes messageSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes recipeSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes tagPopIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .chat-container {
+      margin: 1rem;
+      border-radius: 16px;
+    }
+
+    .chat-header {
+      padding: 1.5rem;
+    }
+
+    .chat-header h1 {
+      font-size: 2rem;
+    }
+
+    .chat-messages {
+      padding: 1rem;
+    }
+
+    .message {
+      max-width: 100%;
+    }
+
+    .controls-section {
+      flex-direction: column;
+    }
+
+    .servings-input {
+      width: 100%;
+    }
+
+    .send-button {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  let ingredients = [];
+
+  document
+    .getElementById("ingredient-input")
+    .addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const ingredient = this.value.trim();
+        if (ingredient && !ingredients.includes(ingredient.toLowerCase())) {
+          ingredients.push(ingredient.toLowerCase());
+          updateIngredientsList();
+          this.value = "";
+        }
+      }
+    });
+
+  function updateIngredientsList() {
+    const list = document.getElementById("ingredients-list");
+    const sendButton = document.getElementById("get-recipes-btn");
+
+    list.innerHTML = ingredients
+      .map(
+        (ingredient) => `
+            <span class="ingredient-tag">
+                        ${ingredient}
+              <button onclick="removeIngredient('${ingredient}')">&times;</button>
+            </span>
+        `
+      )
+      .join("");
+
+    sendButton.disabled = ingredients.length === 0;
+  }
+
+  function removeIngredient(ingredient) {
+    ingredients = ingredients.filter((i) => i !== ingredient);
+    updateIngredientsList();
+  }
+
+  function displayRecipes(recipes) {
+    const recipesContainer = document.getElementById("recipes-container");
+    recipesContainer.innerHTML = "";
+
+    recipes.forEach((recipe) => {
+      const recipeCard = document.createElement("div");
+      recipeCard.className = "recipe-card";
+
+      recipeCard.innerHTML = `
+            <h3>${recipe.name}</h3>
+            <p class="recipe-meta">
+                <span>⏱️ ${recipe.cooking_time}</span>
+                <span>📊 ${recipe.difficulty}</span>
+            </p>
+            <div class="recipe-section">
+                <h4>📝 Ingredients</h4>
+                <ul class="recipe-ingredients">
+                    ${recipe.formatted_ingredients
+                      .map((ing) => `<li>${ing}</li>`)
+                      .join("")}
+                </ul>
+                    </div>
+            <div class="recipe-section">
+                <h4>👩‍🍳 Instructions</h4>
+                <ol class="recipe-instructions">
+                    ${recipe.instructions
+                      .map((step) => `<li>${step}</li>`)
+                      .join("")}
+                </ol>
+                        </div>
+            ${
+              recipe.missing_ingredients.length > 0
+                ? `
+                <div class="recipe-section missing-ingredients">
+                    <h4>🔍 Additional Ingredients Needed</h4>
+                    <ul>
+                        ${recipe.missing_ingredients
+                          .map((ing) => `<li>${ing.amount} ${ing.name}</li>`)
+                          .join("")}
+                                </ul>
+                            </div>
+            `
+                : ""
+            }
+        `;
+
+      recipesContainer.appendChild(recipeCard);
+    });
+  }
+
+  function getRecipes() {
+    const ingredients = Array.from(
+      document.querySelectorAll(".ingredient-tag")
+    ).map((tag) => tag.textContent.replace("×", "").trim());
+
+    const servings = parseInt(document.getElementById("servings").value) || 4;
+
+    if (ingredients.length === 0) {
+      alert("Please add at least one ingredient");
+      return;
+    }
+
+    // Show loading state
+    const button = document.getElementById("get-recipes-btn");
+    button.classList.add("loading");
+    button.disabled = true;
+
+    // Clear previous recipes and messages
+    document.getElementById("recipes-container").innerHTML = "";
+
+    // Add loading message with special class
+    const loadingMessage = appendMessage(
+      "🔍 Generating recipe suggestions...",
+      "system loading-message"
+    );
+
+    fetch("/api/chat_recipe_suggestions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ingredients: ingredients,
+        servings: servings,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Remove loading message
+        loadingMessage.remove();
+
+        if (data.success && data.recipes) {
+          displayRecipes(data.recipes);
+          appendMessage(
+            "✨ Here are your recipe suggestions! Scroll down to view them.",
+            "system"
+          );
+        } else {
+          appendMessage(
+            `❌ ${
+              data.message || "Failed to generate recipes. Please try again."
+            }`,
+            "system"
+          );
+        }
+      })
+      .catch((error) => {
+        // Remove loading message
+        loadingMessage.remove();
+
+        console.error("Error:", error);
+        appendMessage("❌ Something went wrong. Please try again.", "system");
+      })
+      .finally(() => {
+        button.classList.remove("loading");
+        button.disabled = false;
+      });
+  }
+
+  function appendMessage(content, type) {
+    const messagesContainer = document.getElementById("chat-messages");
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `message ${type}`;
+    messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    return messageDiv;
+  }
+</script>
+{% endblock %}

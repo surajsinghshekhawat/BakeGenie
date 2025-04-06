@@ -1,0 +1,482 @@
+# Alphabetical List of Ingredient Densities
+
+Agar Powder: 0.70 g/ml
+Agave Nectar: 1.38 g/ml
+Almond Extract: 0.88 g/ml
+Almond Flour: 0.48 g/ml
+Almond Milk: 1.00 g/ml
+Almonds (ground): 0.63 g/ml
+Almonds (sliced): 0.35 g/ml
+Almonds (slivered): 0.37 g/ml
+Almonds (whole): 0.45 g/ml
+All-Purpose Flour: 0.55 g/ml
+All-Purpose Flour (packed): 0.65 g/ml
+All-Purpose Flour (sifted): 0.45 g/ml
+Amaranth: 0.68 g/ml
+Apple Cider Vinegar: 1.02 g/ml
+Apricots (chopped, dried): 0.60 g/ml
+Arrowroot: 0.47 g/ml
+Avocado Oil: 0.91 g/ml
+
+Baking Powder: 0.90 g/ml
+Baking Soda: 0.85 g/ml
+Balsamic Vinegar: 1.06 g/ml
+Bell Pepper Flakes: 0.28 g/ml
+Black Pepper: 0.46 g/ml
+Bonito Flakes: 0.15 g/ml
+Bread Flour: 0.58 g/ml
+Brazil Nuts: 0.45 g/ml
+Brown Sugar (dark): 0.95 g/ml
+Brown Sugar (dark, packed): 1.12 g/ml
+Brown Sugar (light): 0.93 g/ml
+Brown Sugar (light, packed): 1.10 g/ml
+Buckwheat: 0.62 g/ml
+Buttermilk: 1.03 g/ml
+Buttermilk Powder: 0.53 g/ml
+Butter (cold, 4°C): 0.96 g/ml
+Butter (melted, 35°C): 0.92 g/ml
+Butter (room temp, 20°C): 0.911 g/ml
+
+Cake Flour: 0.50 g/ml
+Canola Oil: 0.92 g/ml
+Cardamom: 0.48 g/ml
+Cashews: 0.47 g/ml
+Chaat Masala: 0.49 g/ml
+Chia Seeds: 0.68 g/ml
+Chickpea Flour: 0.55 g/ml
+Chocolate (chips): 0.63 g/ml
+Chocolate (grated): 0.50 g/ml
+Chocolate (melted): 1.15 g/ml
+Cinnamon: 0.56 g/ml
+Cloves: 0.53 g/ml
+Cocoa Powder (Dutch-process): 0.54 g/ml
+Cocoa Powder (natural): 0.53 g/ml
+Coconut Flour: 0.30 g/ml
+Coconut Milk: 0.98 g/ml
+Coconut Oil (liquid, 35°C): 0.90 g/ml
+Coconut Oil (solid, 20°C): 0.92 g/ml
+Coconut Sugar: 0.82 g/ml
+Collagen Powder: 0.32 g/ml
+Corn Oil: 0.92 g/ml
+Cornstarch: 0.45 g/ml
+Corn Syrup (dark): 1.39 g/ml
+Corn Syrup (light): 1.38 g/ml
+Cranberries (dried): 0.62 g/ml
+Cream Powder: 0.52 g/ml
+Crème Fraîche: 1.03 g/ml
+Curry Powder: 0.48 g/ml
+
+Dashi Powder: 0.52 g/ml
+Dates (chopped, dried): 0.68 g/ml
+Demerara Sugar: 0.88 g/ml
+Doenjang: 1.22 g/ml
+Dried Seaweed (crushed): 0.20 g/ml
+
+Egg White: 1.04 g/ml
+Egg Yolk: 1.07 g/ml
+Eggs (whole): 1.03 g/ml
+Egg Substitute (liquid): 1.02 g/ml
+
+Farro: 0.69 g/ml
+Figs (chopped, dried): 0.64 g/ml
+Flax Seeds: 0.65 g/ml
+
+Garam Masala: 0.51 g/ml
+Garlic Powder: 0.50 g/ml
+Ginger: 0.50 g/ml
+Glutinous Rice Flour: 0.60 g/ml
+Gochujang: 1.25 g/ml
+Greek Yogurt: 1.07 g/ml
+Guar Gum: 0.75 g/ml
+
+Half & Half: 1.01 g/ml
+Hazelnut Flour: 0.45 g/ml
+Heavy Cream: 0.994 g/ml
+Honey (cold, 4°C): 1.45 g/ml
+Honey (room temp, 20°C): 1.42 g/ml
+Honey (warm, 35°C): 1.36 g/ml
+
+Kamut: 0.71 g/ml
+Kefir: 1.03 g/ml
+
+Lemon Extract: 0.85 g/ml
+Light Cream: 1.01 g/ml
+
+Macadamia Nuts: 0.44 g/ml
+Maple Syrup (cold, 4°C): 1.42 g/ml
+Maple Syrup (room temp, 20°C): 1.37 g/ml
+Margarine: 0.90 g/ml
+Milk (1%): 1.015 g/ml
+Milk (2%): 1.02 g/ml
+Milk (skim): 1.035 g/ml
+Milk (whole): 1.03 g/ml
+Milk Powder: 0.55 g/ml
+Millet: 0.70 g/ml
+Miso Paste: 1.20 g/ml
+Modified Food Starch: 0.50 g/ml
+Molasses: 1.45 g/ml
+Mochiko: 0.59 g/ml
+
+Natto (mashed): 1.10 g/ml
+Nutritional Yeast: 0.32 g/ml
+Nutmeg: 0.45 g/ml
+
+Oat Milk: 1.02 g/ml
+Olive Oil: 0.92 g/ml
+Onion Flakes: 0.25 g/ml
+
+Parmesan (grated): 0.45 g/ml
+Pastry Flour: 0.53 g/ml
+Pea Protein: 0.40 g/ml
+Peanut Oil: 0.91 g/ml
+Pecan Flour: 0.43 g/ml
+Pecans (chopped): 0.48 g/ml
+Pecans (ground): 0.60 g/ml
+Pecans (whole): 0.40 g/ml
+Pectin: 0.65 g/ml
+Pine Nuts: 0.43 g/ml
+Pistachio Flour: 0.46 g/ml
+Pistachios (shelled): 0.46 g/ml
+Poppy Seeds: 0.64 g/ml
+Potato Starch: 0.48 g/ml
+Powdered Sugar: 0.56 g/ml
+Powdered Sugar (sifted): 0.50 g/ml
+Pumpkin Seeds: 0.48 g/ml
+
+Quinoa: 0.65 g/ml
+
+Raisins: 0.65 g/ml
+Rice (arborio): 0.80 g/ml
+Rice (brown): 0.77 g/ml
+Rice (long grain): 0.75 g/ml
+Rice (short grain): 0.78 g/ml
+Rice (wild): 0.72 g/ml
+Rice Flour: 0.55 g/ml
+Rice Milk: 1.01 g/ml
+Rice Starch: 0.46 g/ml
+Rice Vinegar: 1.01 g/ml
+Rolled Oats: 0.41 g/ml
+Romano (grated): 0.44 g/ml
+Rosemary: 0.17 g/ml
+Rye Flour: 0.62 g/ml
+
+Self-Rising Flour: 0.56 g/ml
+Sesame Oil: 0.92 g/ml
+Sesame Seeds: 0.58 g/ml
+Shortening: 0.88 g/ml
+Sorghum: 0.72 g/ml
+Sour Cream: 1.05 g/ml
+Soy Milk: 1.01 g/ml
+Soy Protein Powder: 0.38 g/ml
+Spelt: 0.68 g/ml
+Sunflower Seeds: 0.52 g/ml
+Sweet Potato Starch: 0.48 g/ml
+Sweet Rice Flour: 0.58 g/ml
+
+Table Salt: 2.17 g/ml
+Tandoori Masala: 0.50 g/ml
+Tapioca Starch: 0.46 g/ml
+Tempeh (crumbled): 0.45 g/ml
+Teff: 0.70 g/ml
+Thyme: 0.20 g/ml
+Tomato Powder: 0.55 g/ml
+
+Vanilla Extract: 0.89 g/ml
+Vegetable Oil: 0.92 g/ml
+
+Walnuts (chopped): 0.50 g/ml
+Walnuts (ground): 0.62 g/ml
+Walnuts (whole): 0.42 g/ml
+Wasabi Powder: 0.48 g/ml
+Water Chestnut Starch: 0.49 g/ml
+Whey Powder: 0.50 g/ml
+Whey Protein Isolate: 0.35 g/ml
+White Vinegar: 1.01 g/ml
+Whole Wheat Flour: 0.60 g/ml
+Whipping Cream: 0.997 g/ml
+
+Xanthan Gum: 0.70 g/ml
+
+Yeast (active dry): 0.75 g/ml
+Yeast (fresh/cake): 1.08 g/ml
+Yeast (instant): 0.77 g/ml
+Yogurt (plain): 1.04 g/ml
+
+### Additional Baking Ingredients
+
+Almond Paste: 1.15 g/ml
+Apple Butter: 1.20 g/ml
+Apple Sauce: 1.05 g/ml
+Baking Chocolate (unsweetened): 1.10 g/ml
+Baking Chocolate (semi-sweet): 1.12 g/ml
+Baking Chocolate (white): 1.11 g/ml
+Bread Crumbs (dry): 0.35 g/ml
+Bread Crumbs (fresh): 0.50 g/ml
+Brown Rice Syrup: 1.40 g/ml
+Buttercream Frosting: 1.10 g/ml
+Cake Mix (dry): 0.55 g/ml
+Candied Ginger: 1.20 g/ml
+Caramel Sauce: 1.30 g/ml
+Chocolate Ganache: 1.20 g/ml
+Chocolate Syrup: 1.30 g/ml
+Cocoa Butter: 0.92 g/ml
+Coconut Cream: 1.00 g/ml
+Coconut Flakes (sweetened): 0.35 g/ml
+Coconut Flakes (unsweetened): 0.30 g/ml
+Cream Cheese: 1.01 g/ml
+Cream Cheese Frosting: 1.05 g/ml
+Crystallized Ginger: 1.15 g/ml
+Dark Corn Syrup: 1.40 g/ml
+Date Paste: 1.25 g/ml
+Dried Blueberries: 0.60 g/ml
+Dried Cherries: 0.65 g/ml
+Dried Cranberries: 0.62 g/ml
+Dried Currants: 0.68 g/ml
+Dried Figs (chopped): 0.64 g/ml
+Dried Mango (chopped): 0.58 g/ml
+Dried Pineapple (chopped): 0.55 g/ml
+Dried Raisins: 0.65 g/ml
+Dulce de Leche: 1.30 g/ml
+Evaporated Milk: 1.05 g/ml
+Fondant: 1.25 g/ml
+Fruit Puree (general): 1.10 g/ml
+Gelatin Powder: 0.60 g/ml
+Glucose Syrup: 1.35 g/ml
+Golden Syrup: 1.40 g/ml
+Graham Cracker Crumbs: 0.45 g/ml
+Hazelnut Paste: 1.15 g/ml
+Invert Sugar: 1.35 g/ml
+Jam/Jelly: 1.30 g/ml
+Lemon Curd: 1.20 g/ml
+Malt Syrup: 1.40 g/ml
+Marshmallow Fluff: 0.60 g/ml
+Mascarpone: 1.05 g/ml
+Meringue Powder: 0.50 g/ml
+Milk Chocolate: 1.12 g/ml
+Milk Powder (non-fat): 0.55 g/ml
+Milk Powder (whole): 0.52 g/ml
+Mincemeat: 1.15 g/ml
+Molasses (blackstrap): 1.45 g/ml
+Molasses (light): 1.42 g/ml
+Nutella: 1.15 g/ml
+Oat Flour: 0.45 g/ml
+Orange Marmalade: 1.30 g/ml
+Peanut Butter: 1.10 g/ml
+Pecan Butter: 1.08 g/ml
+Pie Filling (canned): 1.15 g/ml
+Pistachio Paste: 1.15 g/ml
+Pomegranate Molasses: 1.35 g/ml
+Praline Paste: 1.15 g/ml
+Pumpkin Puree: 1.05 g/ml
+Red Bean Paste: 1.20 g/ml
+Rice Malt Syrup: 1.40 g/ml
+Ricotta Cheese: 1.05 g/ml
+Royal Icing: 1.20 g/ml
+Sesame Paste: 1.15 g/ml
+Shortbread Crumbs: 0.45 g/ml
+Sour Cream (full fat): 1.05 g/ml
+Sour Cream (light): 1.03 g/ml
+Soy Flour: 0.55 g/ml
+Sprouted Wheat Flour: 0.58 g/ml
+Sweetened Condensed Milk: 1.30 g/ml
+Tahini: 1.15 g/ml
+Tapioca Flour: 0.46 g/ml
+Treacle: 1.40 g/ml
+Vanilla Bean Paste: 1.15 g/ml
+Vanilla Sugar: 0.80 g/ml
+Walnut Butter: 1.08 g/ml
+White Chocolate: 1.11 g/ml
+Yogurt (Greek, full fat): 1.07 g/ml
+Yogurt (Greek, non-fat): 1.05 g/ml
+
+Notes:
+1. All densities are measured at room temperature (20°C) unless otherwise specified
+2. Density can vary based on:
+   - Temperature
+   - Humidity
+   - Method of measuring (sifted, packed, etc.)
+   - Brand or variety of ingredient
+3. For best results, use weight measurements when possible
+4. Density values are approximate and may vary slightly by brand/region
+
+### Additional Ingredients
+
+Acai Powder: 0.45 g/ml
+Acorn Flour: 0.55 g/ml
+Adzuki Beans (cooked): 0.85 g/ml
+Adzuki Beans (dry): 0.75 g/ml
+Amaranth Flour: 0.55 g/ml
+Anchovy Paste: 1.15 g/ml
+Anise Seeds: 0.45 g/ml
+Annatto Powder: 0.50 g/ml
+Apple Cider: 1.02 g/ml
+Apple Juice Concentrate: 1.30 g/ml
+Apple Powder: 0.45 g/ml
+Apricot Jam: 1.30 g/ml
+Arrowroot Flour: 0.47 g/ml
+Artichoke Hearts (canned): 1.05 g/ml
+Artichoke Powder: 0.45 g/ml
+Asafoetida: 0.50 g/ml
+Bamboo Shoots (canned): 1.00 g/ml
+Banana Flour: 0.50 g/ml
+Banana Puree: 1.10 g/ml
+Barley Flour: 0.55 g/ml
+Barley Malt Syrup: 1.40 g/ml
+Basil (dried): 0.20 g/ml
+Bay Leaves (ground): 0.25 g/ml
+Beet Powder: 0.45 g/ml
+Black Bean Paste: 1.20 g/ml
+Black Garlic: 1.10 g/ml
+Black Sesame Seeds: 0.58 g/ml
+Blackstrap Molasses: 1.45 g/ml
+Blueberry Powder: 0.45 g/ml
+Bone Broth Powder: 0.50 g/ml
+Bran (wheat): 0.30 g/ml
+Breadfruit Flour: 0.55 g/ml
+Buckwheat Groats: 0.65 g/ml
+Buckwheat Honey: 1.42 g/ml
+Butternut Squash Puree: 1.05 g/ml
+Cacao Nibs: 0.60 g/ml
+Cacao Powder: 0.55 g/ml
+Calamansi Juice: 1.02 g/ml
+Caraway Seeds: 0.45 g/ml
+Carob Powder: 0.55 g/ml
+Carrot Powder: 0.45 g/ml
+Cashew Butter: 1.10 g/ml
+Celery Salt: 1.20 g/ml
+Chamomile Flowers (dried): 0.15 g/ml
+Cherry Powder: 0.45 g/ml
+Chia Gel: 1.10 g/ml
+Chickpea Water (aquafaba): 1.02 g/ml
+Chicory Root Powder: 0.45 g/ml
+Chinese Five Spice: 0.50 g/ml
+Chocolate Hazelnut Spread: 1.15 g/ml
+Cinnamon Sugar: 0.80 g/ml
+Citrus Zest (dried): 0.25 g/ml
+Clarified Butter: 0.90 g/ml
+Coconut Aminos: 1.10 g/ml
+Coconut Butter: 0.95 g/ml
+Coconut Manna: 0.95 g/ml
+Coconut Palm Sugar: 0.82 g/ml
+Coconut Water Powder: 0.45 g/ml
+Coffee Extract: 0.90 g/ml
+Coffee Powder: 0.45 g/ml
+Colostrum Powder: 0.50 g/ml
+Cranberry Powder: 0.45 g/ml
+Cream of Tartar: 0.90 g/ml
+Crystallized Honey: 1.45 g/ml
+Cucumber Powder: 0.45 g/ml
+Curry Leaves (dried): 0.20 g/ml
+Dandelion Root Powder: 0.45 g/ml
+Date Sugar: 0.80 g/ml
+Dijon Mustard: 1.10 g/ml
+Dulse Flakes: 0.20 g/ml
+Elderberry Powder: 0.45 g/ml
+Elderflower Syrup: 1.30 g/ml
+Fennel Seeds: 0.45 g/ml
+Fenugreek Seeds: 0.45 g/ml
+Fig Powder: 0.45 g/ml
+Flaxseed Meal: 0.65 g/ml
+Fruit Pectin: 0.65 g/ml
+Galangal Powder: 0.50 g/ml
+Garam Masala Powder: 0.51 g/ml
+Ghee: 0.90 g/ml
+Ginger Powder: 0.50 g/ml
+Goji Berry Powder: 0.45 g/ml
+Grapefruit Powder: 0.45 g/ml
+Green Tea Powder: 0.45 g/ml
+Guava Powder: 0.45 g/ml
+Hibiscus Powder: 0.45 g/ml
+Hickory Syrup: 1.40 g/ml
+Horseradish Powder: 0.50 g/ml
+Huckleberry Powder: 0.45 g/ml
+Juniper Berries (ground): 0.45 g/ml
+Kaffir Lime Leaves (dried): 0.20 g/ml
+Kale Powder: 0.45 g/ml
+Kelp Powder: 0.45 g/ml
+Kombu Powder: 0.45 g/ml
+Lavender Flowers (dried): 0.15 g/ml
+Lemon Balm (dried): 0.20 g/ml
+Lemon Powder: 0.45 g/ml
+Licorice Root Powder: 0.45 g/ml
+Lime Powder: 0.45 g/ml
+Liquid Smoke: 1.10 g/ml
+Lotus Root Powder: 0.45 g/ml
+Maca Powder: 0.45 g/ml
+Mahlab: 0.50 g/ml
+Mango Powder: 0.45 g/ml
+Maple Sugar: 0.80 g/ml
+Marjoram (dried): 0.20 g/ml
+Matcha Powder: 0.45 g/ml
+Mesquite Powder: 0.45 g/ml
+Mint Powder: 0.45 g/ml
+Miso Powder: 0.50 g/ml
+Moringa Powder: 0.45 g/ml
+Mulberry Powder: 0.45 g/ml
+Mustard Powder: 0.50 g/ml
+Nettle Powder: 0.45 g/ml
+Nigella Seeds: 0.45 g/ml
+Nori Flakes: 0.20 g/ml
+Orange Powder: 0.45 g/ml
+Oregano (dried): 0.20 g/ml
+Palm Sugar: 0.82 g/ml
+Papaya Powder: 0.45 g/ml
+Parsley (dried): 0.20 g/ml
+Passionfruit Powder: 0.45 g/ml
+Peach Powder: 0.45 g/ml
+Pear Powder: 0.45 g/ml
+Pecan Meal: 0.45 g/ml
+Peppermint Extract: 0.88 g/ml
+Persimmon Powder: 0.45 g/ml
+Pineapple Powder: 0.45 g/ml
+Pink Peppercorns (ground): 0.45 g/ml
+Pomegranate Powder: 0.45 g/ml
+Poppy Seed Paste: 1.15 g/ml
+Pumpkin Powder: 0.45 g/ml
+Purple Sweet Potato Powder: 0.45 g/ml
+Quince Paste: 1.20 g/ml
+Raspberry Powder: 0.45 g/ml
+Red Pepper Flakes: 0.28 g/ml
+Rhubarb Powder: 0.45 g/ml
+Rose Petals (dried): 0.15 g/ml
+Rose Water: 1.00 g/ml
+Rosemary (dried): 0.17 g/ml
+Saffron (ground): 0.45 g/ml
+Sage (dried): 0.20 g/ml
+Sarsaparilla Powder: 0.45 g/ml
+Sassafras Powder: 0.45 g/ml
+Sea Buckthorn Powder: 0.45 g/ml
+Sea Salt Flakes: 1.20 g/ml
+Sesame Tahini: 1.15 g/ml
+Shallot Powder: 0.45 g/ml
+Sorghum Flour: 0.55 g/ml
+Sorrel Powder: 0.45 g/ml
+Spearmint Powder: 0.45 g/ml
+Spirulina Powder: 0.45 g/ml
+Star Anise (ground): 0.45 g/ml
+Stevia Powder: 0.45 g/ml
+Strawberry Powder: 0.45 g/ml
+Sumac Powder: 0.45 g/ml
+Sunflower Seed Butter: 1.10 g/ml
+Sweet Potato Powder: 0.45 g/ml
+Tamarind Paste: 1.20 g/ml
+Tangerine Powder: 0.45 g/ml
+Tarragon (dried): 0.20 g/ml
+Thyme (dried): 0.20 g/ml
+Tiger Nut Flour: 0.55 g/ml
+Tofu (silken): 1.05 g/ml
+Tomato Powder: 0.55 g/ml
+Turmeric Powder: 0.50 g/ml
+Ube Powder: 0.45 g/ml
+Vanilla Powder: 0.45 g/ml
+Wakame Flakes: 0.20 g/ml
+Wasabi Powder: 0.48 g/ml
+Watermelon Powder: 0.45 g/ml
+Wheat Germ: 0.35 g/ml
+White Pepper (ground): 0.45 g/ml
+White Sesame Seeds: 0.58 g/ml
+Yacon Syrup: 1.35 g/ml
+Yam Powder: 0.45 g/ml
+Yuzu Powder: 0.45 g/ml
+Za'atar: 0.50 g/ml
+Zucchini Powder: 0.45 g/ml 

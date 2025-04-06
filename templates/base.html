@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BakeGenie - {% block title %}Home{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cookie&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    {% block head %}{% endblock %}
+  </head>
+  <body class="fade-in">
+    <nav class="navbar slide-down">
+      <div class="logo">
+        <a href="/">
+          <span class="logo-text">BakeGenie</span>
+          <i class="fas fa-cookie-bite"></i>
+        </a>
+      </div>
+      <div class="nav-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <ul class="nav-menu">
+        <li>
+          <a
+            href="/"
+            class="nav-link {% if request.path == '/' %}active{% endif %}"
+            >Home</a
+          >
+        </li>
+        <li>
+          <a
+            href="/measure"
+            class="nav-link {% if request.path == '/measure' %}active{% endif %}"
+            >Measure</a
+          >
+        </li>
+        <li>
+          <a
+            href="/adjust"
+            class="nav-link {% if request.path == '/adjust' %}active{% endif %}"
+            >Adjust Recipe</a
+          >
+        </li>
+        <li>
+          <a
+            href="/ingredients"
+            class="nav-link {% if request.path == '/ingredients' %}active{% endif %}"
+            >Ingredients</a
+          >
+        </li>
+        <li>
+          <a
+            href="/recipes"
+            class="nav-link {% if request.path == '/recipes' %}active{% endif %}"
+            >Recipes</a
+          >
+        </li>
+        <li>
+          <a
+            href="/chatbot"
+            class="nav-link {% if request.path == '/chatbot' %}active{% endif %}"
+            >Recipe AI</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <main class="content">{% block content %}{% endblock %}</main>
+
+    <footer class="footer slide-up">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <span class="logo-text">BakeGenie</span>
+          <i class="fas fa-cookie-bite"></i>
+        </div>
+        <div class="footer-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/measure">Measure</a></li>
+            <li><a href="/adjust">Adjust Recipe</a></li>
+            <li><a href="/ingredients">Ingredients</a></li>
+            <li><a href="/recipes">Recipes</a></li>
+            <li><a href="/chatbot">Recipe AI</a></li>
+          </ul>
+        </div>
+        <div class="footer-about">
+          <h3>About BakeGenie</h3>
+          <p>
+            A smart kitchen companion that helps you measure ingredients
+            accurately, adjust recipes, and discover new baking ideas with
+            artificial intelligence.
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 BakeGenie. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

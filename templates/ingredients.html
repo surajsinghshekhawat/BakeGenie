@@ -1,0 +1,961 @@
+{% extends "layout.html" %} {% block title %}Ingredients Database{% endblock %}
+{% block head %}
+<style>
+  .ingredients-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .ingredients-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .ingredients-header h1 {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-dark)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+    animation: slideDown 0.5s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .ingredients-header h1::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-dark)
+    );
+    border-radius: 2px;
+  }
+
+  .ingredients-header p {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: slideUp 0.5s ease-out 0.2s backwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .search-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .search-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .search-box {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .search-box input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(109, 76, 65, 0.1);
+    outline: none;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+  }
+
+  .ingredient-dropdown select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .ingredient-dropdown select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(109, 76, 65, 0.1);
+    outline: none;
+  }
+
+  .conversion-calculator {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .conversion-calculator:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .conversion-calculator h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    position: relative;
+    display: inline-block;
+  }
+
+  .conversion-calculator h2::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-dark)
+    );
+  }
+
+  .calculator-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 500;
+  }
+
+  .form-group select,
+  .form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-group select:focus,
+  .form-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(109, 76, 65, 0.1);
+    outline: none;
+  }
+
+  .btn-primary {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-dark)
+    );
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(109, 76, 65, 0.2);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(109, 76, 65, 0.3);
+    background: linear-gradient(
+      135deg,
+      var(--primary-dark),
+      var(--primary-color)
+    );
+  }
+
+  .conversion-result {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-top: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .conversion-result:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .result-card {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+  }
+
+  .result-image {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .result-card:hover .result-image img {
+    transform: scale(1.05);
+  }
+
+  .result-details {
+    padding: 20px;
+  }
+
+  .conversion-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .conversion-item {
+    background: rgba(109, 76, 65, 0.1);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .conversion-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 5px;
+  }
+
+  .conversion-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .conversion-tips {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(109, 76, 65, 0.1);
+    border-radius: 12px;
+  }
+
+  .conversion-tips h3 {
+    color: var(--text-color);
+    margin-bottom: 15px;
+  }
+
+  .conversion-tips ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .conversion-tips li {
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+  }
+
+  .conversion-tips li::before {
+    content: "•";
+    color: var(--primary-color);
+    position: absolute;
+    left: 0;
+  }
+
+  .ingredients-glossary {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-top: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ingredients-glossary:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .glossary-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .category-button {
+    padding: 8px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    background: white;
+    color: var(--text-color);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .category-button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .category-button.active {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-dark)
+    );
+    border-color: transparent;
+    color: white;
+  }
+
+  .glossary-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .ingredient-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+
+  .ingredient-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .ingredient-card-image {
+    height: 150px;
+    overflow: hidden;
+  }
+
+  .ingredient-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .ingredient-card:hover .ingredient-card-image img {
+    transform: scale(1.05);
+  }
+
+  .ingredient-card-content {
+    padding: 15px;
+  }
+
+  .ingredient-card-content h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--text-color);
+  }
+
+  .ingredient-card-content .density {
+    font-size: 0.9rem;
+    color: var(--text-light);
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+  }
+
+  @media (max-width: 768px) {
+    .result-card {
+      grid-template-columns: 1fr;
+    }
+
+    .conversion-details {
+      grid-template-columns: 1fr;
+    }
+
+    .glossary-categories {
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<section class="ingredients-container">
+  <div class="ingredients-header">
+    <h1>Baking Ingredients Database</h1>
+    <p>Find information and conversions for common baking ingredients</p>
+  </div>
+
+  <div class="search-container">
+    <div class="search-box">
+      <input
+        type="text"
+        id="ingredient-search"
+        placeholder="Search for an ingredient..."
+      />
+      <i class="fas fa-search search-icon"></i>
+    </div>
+    <div class="ingredient-dropdown">
+      <select id="ingredient-select">
+        <option value="">Select an ingredient...</option>
+        {% for ingredient in ingredients %}
+        <option value="{{ ingredient }}">{{ ingredient|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="conversion-calculator">
+    <h2>Volume to Weight Converter</h2>
+    <div class="calculator-form">
+      <div class="form-group">
+        <label for="measurement-type">Measurement:</label>
+        <select id="measurement-type">
+          <option value="cup">Cup</option>
+          <option value="half_cup">1/2 Cup</option>
+          <option value="third_cup">1/3 Cup</option>
+          <option value="quarter_cup">1/4 Cup</option>
+          <option value="tablespoon">Tablespoon</option>
+          <option value="teaspoon">Teaspoon</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" min="0.1" step="0.1" value="1" />
+      </div>
+    </div>
+
+    <button id="calculate-conversion" class="btn btn-primary">
+      Calculate Conversion
+    </button>
+
+    <div id="conversion-result" class="conversion-result" style="display: none">
+      <div class="result-card">
+        <div class="result-image">
+          <img
+            id="result-image"
+            src="{{ url_for('static', filename='images/ingredients/default_ingr.jpeg') }}"
+            alt="Ingredient"
+          />
+        </div>
+        <div class="result-details">
+          <h3 id="result-ingredient-name">Ingredient</h3>
+          <p id="result-description"></p>
+          <div class="conversion-details">
+            <div class="conversion-item">
+              <span class="conversion-label">Volume:</span>
+              <span id="result-volume" class="conversion-value"></span>
+            </div>
+            <div class="conversion-item">
+              <span class="conversion-label">Weight:</span>
+              <span id="result-weight" class="conversion-value"></span>
+            </div>
+            <div class="conversion-item">
+              <span class="conversion-label">Density:</span>
+              <span id="result-density" class="conversion-value"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="conversion-tips">
+        <h3>Baking Tips</h3>
+        <ul id="baking-tips">
+          <li>
+            For precise baking, weighing ingredients is generally more accurate
+            than volume measurements.
+          </li>
+          <li>
+            Different brands of ingredients may have slightly different
+            densities.
+          </li>
+          <li>
+            Sifted flour is less dense than unsifted flour, affecting
+            measurements.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="ingredients-glossary">
+    <h2>Ingredients Glossary</h2>
+    <p>
+      Select an ingredient above to see detailed information, or browse through
+      common baking ingredients below.
+    </p>
+
+    <div class="glossary-categories">
+      <button class="category-button active" data-category="all">All</button>
+      <button class="category-button" data-category="flour">Flours</button>
+      <button class="category-button" data-category="sweetener">
+        Sweeteners
+      </button>
+      <button class="category-button" data-category="dairy">Dairy</button>
+      <button class="category-button" data-category="leavening">
+        Leavening Agents
+      </button>
+      <button class="category-button" data-category="flavor">
+        Flavors & Spices
+      </button>
+    </div>
+
+    <div class="glossary-list" id="glossary-list">
+      <!-- Ingredients will be dynamically added here -->
+      <div class="empty-state">
+        <i class="fas fa-search"></i>
+        <p>
+          Select an ingredient to view details or search to find specific
+          ingredients.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ingredientSearch = document.getElementById("ingredient-search");
+    const ingredientSelect = document.getElementById("ingredient-select");
+    const measurementType = document.getElementById("measurement-type");
+    const quantity = document.getElementById("quantity");
+    const calculateButton = document.getElementById("calculate-conversion");
+    const resultCard = document.getElementById("conversion-result");
+    const resultIngredientName = document.getElementById(
+      "result-ingredient-name"
+    );
+    const resultImage = document.getElementById("result-image");
+    const resultDescription = document.getElementById("result-description");
+    const resultVolume = document.getElementById("result-volume");
+    const resultWeight = document.getElementById("result-weight");
+    const resultDensity = document.getElementById("result-density");
+    const bakingTips = document.getElementById("baking-tips");
+    const glossaryList = document.getElementById("glossary-list");
+    const categoryButtons = document.querySelectorAll(".category-button");
+
+    let ingredientsData = {};
+    let selectedIngredient = null;
+
+    // Synchronize search field and dropdown
+    ingredientSearch.addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+      Array.from(ingredientSelect.options).forEach((option) => {
+        const optionText = option.text.toLowerCase();
+        if (option.value === "" || optionText.includes(searchTerm)) {
+          option.style.display = "";
+        } else {
+          option.style.display = "none";
+        }
+      });
+    });
+
+    // Handle ingredient selection
+    ingredientSelect.addEventListener("change", function () {
+      const ingredientName = this.value;
+      if (ingredientName) {
+        fetch(
+          `/api/get_ingredient_details?ingredient=${encodeURIComponent(
+            ingredientName
+          )}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              console.error(data.error);
+              return;
+            }
+
+            selectedIngredient = ingredientName;
+            ingredientsData[ingredientName] = data;
+            updateIngredientDisplay();
+
+            // Show the result card first
+            resultCard.style.display = "block";
+            resultCard.style.opacity = "0";
+            resultCard.style.transform = "translateY(20px)";
+
+            // Scroll to the calculator section
+            const calculatorSection = document.querySelector(
+              ".conversion-calculator"
+            );
+            const yOffset = -100; // Adjust this value to fine-tune the scroll position
+            const y =
+              calculatorSection.getBoundingClientRect().top +
+              window.pageYOffset +
+              yOffset;
+            window.scrollTo({ top: y, behavior: "smooth" });
+
+            // Animate the result card
+            setTimeout(() => {
+              resultCard.style.transition = "all 0.5s ease-out";
+              resultCard.style.opacity = "1";
+              resultCard.style.transform = "translateY(0)";
+            }, 100);
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    });
+
+    // Update ingredient display
+    function updateIngredientDisplay() {
+      if (!selectedIngredient) return;
+
+      const data = ingredientsData[selectedIngredient];
+      resultIngredientName.textContent =
+        selectedIngredient.charAt(0).toUpperCase() +
+        selectedIngredient.slice(1);
+      resultImage.src =
+        data.image_path ||
+        "{{ url_for('static', filename='images/ingredients/default_ingr.jpeg') }}";
+      resultDescription.textContent = data.description || "";
+      resultDensity.textContent = `${data.base_density} ${data.unit || "g/ml"}`;
+
+      // Add baking tips based on ingredient properties
+      const tips = [];
+      if (data.available_states && data.available_states.length > 0) {
+        tips.push(
+          `This ingredient has different states: ${data.available_states.join(
+            ", "
+          )}`
+        );
+      }
+      if (data.temp_points && data.temp_points.length > 0) {
+        tips.push(
+          `Density varies with temperature at: ${data.temp_points.join(", ")}°C`
+        );
+      }
+      if (data.notes) {
+        tips.push(data.notes);
+      }
+
+      // Update baking tips
+      const tipsList = bakingTips.querySelector("ul");
+      tipsList.innerHTML = "";
+      tips.forEach((tip) => {
+        const li = document.createElement("li");
+        li.textContent = tip;
+        tipsList.appendChild(li);
+      });
+    }
+
+    // Calculate conversion
+    calculateButton.addEventListener("click", function () {
+      if (!selectedIngredient) {
+        alert("Please select an ingredient first");
+        return;
+      }
+
+      const ingredientData = ingredientsData[selectedIngredient];
+      const selectedMeasurement = measurementType.value;
+      const qty = parseFloat(quantity.value);
+
+      if (isNaN(qty) || qty <= 0) {
+        alert("Please enter a valid quantity");
+        return;
+      }
+
+      // Get volume in ml for the selected measurement
+      let volumeInMl;
+      switch (selectedMeasurement) {
+        case "cup":
+          volumeInMl = 236.588 * qty;
+          break;
+        case "half_cup":
+          volumeInMl = 118.294 * qty;
+          break;
+        case "third_cup":
+          volumeInMl = 78.86 * qty;
+          break;
+        case "quarter_cup":
+          volumeInMl = 59.147 * qty;
+          break;
+        case "tablespoon":
+          volumeInMl = 14.787 * qty;
+          break;
+        case "teaspoon":
+          volumeInMl = 4.929 * qty;
+          break;
+        default:
+          volumeInMl = 0;
+      }
+
+      // Calculate weight based on density
+      const weightInGrams = volumeInMl * ingredientData.base_density;
+
+      // Format measurement name
+      let measurementName;
+      switch (selectedMeasurement) {
+        case "cup":
+          measurementName = qty === 1 ? "1 cup" : `${qty} cups`;
+          break;
+        case "half_cup":
+          measurementName = qty === 1 ? "1/2 cup" : `${qty} half cups`;
+          break;
+        case "third_cup":
+          measurementName = qty === 1 ? "1/3 cup" : `${qty} third cups`;
+          break;
+        case "quarter_cup":
+          measurementName = qty === 1 ? "1/4 cup" : `${qty} quarter cups`;
+          break;
+        case "tablespoon":
+          measurementName = qty === 1 ? "1 tablespoon" : `${qty} tablespoons`;
+          break;
+        case "teaspoon":
+          measurementName = qty === 1 ? "1 teaspoon" : `${qty} teaspoons`;
+          break;
+        default:
+          measurementName = "";
+      }
+
+      resultVolume.textContent = `${measurementName} (${volumeInMl.toFixed(
+        1
+      )} ml)`;
+      resultWeight.textContent = `${weightInGrams.toFixed(1)} grams`;
+
+      // Show results with animation
+      resultCard.style.display = "block";
+      resultCard.style.opacity = "0";
+      resultCard.style.transform = "translateY(20px)";
+      setTimeout(() => {
+        resultCard.style.transition = "all 0.5s ease-out";
+        resultCard.style.opacity = "1";
+        resultCard.style.transform = "translateY(0)";
+      }, 50);
+
+      // Scroll to results
+      resultCard.scrollIntoView({ behavior: "smooth" });
+    });
+
+    // Populate the glossary
+    async function populateGlossary() {
+      glossaryList.innerHTML = "";
+      const ingredientOptions = Array.from(ingredientSelect.options)
+        .filter((option) => option.value)
+        .map((option) => option.value);
+
+      for (const ingredient of ingredientOptions) {
+        if (!ingredientsData[ingredient]) {
+          try {
+            const response = await fetch(
+              `/api/get_ingredient_details?ingredient=${encodeURIComponent(
+                ingredient
+              )}`
+            );
+            if (response.ok) {
+              ingredientsData[ingredient] = await response.json();
+            }
+          } catch (error) {
+            console.error(`Error fetching details for ${ingredient}:`, error);
+          }
+        }
+
+        if (ingredientsData[ingredient]) {
+          const card = createIngredientCard(
+            ingredient,
+            ingredientsData[ingredient]
+          );
+          glossaryList.appendChild(card);
+        }
+      }
+    }
+
+    // Create ingredient card for glossary
+    function createIngredientCard(name, data) {
+      const card = document.createElement("div");
+      card.className = "ingredient-card";
+      card.setAttribute("data-ingredient", name);
+
+      const categories = [];
+      if (name.includes("flour")) categories.push("flour");
+      if (name.includes("sugar") || name.includes("honey"))
+        categories.push("sweetener");
+      if (
+        name.includes("milk") ||
+        name.includes("butter") ||
+        name.includes("cream") ||
+        name.includes("yogurt")
+      )
+        categories.push("dairy");
+      if (name.includes("powder") || name.includes("soda"))
+        categories.push("leavening");
+      if (
+        name.includes("vanilla") ||
+        name.includes("cinnamon") ||
+        name.includes("extract")
+      )
+        categories.push("flavor");
+
+      card.setAttribute("data-categories", categories.join(" "));
+
+      card.innerHTML = `
+                <div class="ingredient-card-image">
+                    <img src="${
+                      data.image_path ||
+                      "{{ url_for('static', filename='images/ingredients/default_ingr.jpeg') }}"
+                    }" alt="${name}">
+                </div>
+                <div class="ingredient-card-content">
+                    <h3>${name.charAt(0).toUpperCase() + name.slice(1)}</h3>
+                    <p class="density">Density: ${data.base_density} ${
+        data.unit || "g/ml"
+      }</p>
+                </div>
+            `;
+
+      card.addEventListener("click", function () {
+        ingredientSelect.value = name;
+        ingredientSearch.value = name.charAt(0).toUpperCase() + name.slice(1);
+        selectedIngredient = name;
+        updateIngredientDisplay();
+
+        // Show the result card first
+        resultCard.style.display = "block";
+        resultCard.style.opacity = "0";
+        resultCard.style.transform = "translateY(20px)";
+
+        // Wait for the result card to be displayed before scrolling
+        requestAnimationFrame(() => {
+          const calculatorSection = document.querySelector(
+            ".conversion-calculator"
+          );
+          const yOffset = -100;
+          const y =
+            calculatorSection.getBoundingClientRect().top +
+            window.pageYOffset +
+            yOffset;
+
+          // Smooth scroll to the calculator section
+          window.scrollTo({
+            top: y,
+            behavior: "smooth",
+          });
+
+          // Animate the result card after a short delay
+          setTimeout(() => {
+            resultCard.style.transition = "all 0.5s ease-out";
+            resultCard.style.opacity = "1";
+            resultCard.style.transform = "translateY(0)";
+          }, 100);
+        });
+      });
+
+      return card;
+    }
+
+    // Filter glossary by category
+    categoryButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        categoryButtons.forEach((btn) => btn.classList.remove("active"));
+        this.classList.add("active");
+
+        const category = this.getAttribute("data-category");
+        const cards = glossaryList.querySelectorAll(".ingredient-card");
+
+        cards.forEach((card) => {
+          if (
+            category === "all" ||
+            card.getAttribute("data-categories").includes(category)
+          ) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+    });
+
+    // Initialize glossary on page load
+    populateGlossary();
+  });
+</script>
+{% endblock %}
