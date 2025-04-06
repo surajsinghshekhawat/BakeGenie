@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import logging
+from .sample_recipes import SAMPLE_RECIPES
 
 # Set up logging
 logging.basicConfig(
@@ -73,87 +74,10 @@ def init_sample_db():
             )
         ''')
         
-        # Insert sample recipes
-        sample_recipes = [
-            {
-                'name': 'Classic Chocolate Cake',
-                'description': 'A moist and rich chocolate cake that\'s perfect for any occasion.',
-                'instructions': '1. Preheat oven to 350°F\n2. Mix dry ingredients\n3. Add wet ingredients\n4. Bake for 30 minutes',
-                'image_path': '/static/images/default-recipe.jpg',
-                'dietary': 'Vegetarian',
-                'difficulty': 'Medium',
-                'serving_size': 8,
-                'prep_time': 20,
-                'cook_time': 30,
-                'total_time': 50,
-                'calories': 350,
-                'protein': 5,
-                'carbs': 45,
-                'fat': 20,
-                'fiber': 2,
-                'sugar': 30,
-                'cuisine_type': 'American',
-                'meal_type': 'Dessert',
-                'author': 'Baking App',
-                'rating': 4.5,
-                'review_count': 100,
-                'tips': '1. Make sure all ingredients are at room temperature\n2. Sift dry ingredients for a lighter texture\n3. Don\'t overmix the batter',
-                'storage_instructions': 'Store in an airtight container at room temperature for up to 3 days',
-                'equipment_needed': 'Mixing bowls, Whisk, Cake pan, Oven, Measuring cups',
-                'temperature': '350°F',
-                'source': 'Baking App Collection',
-                'ingredients': [
-                    {'name': 'All-purpose flour', 'amount': 2, 'unit': 'cups', 'is_optional': False},
-                    {'name': 'Sugar', 'amount': 1.5, 'unit': 'cups', 'is_optional': False},
-                    {'name': 'Cocoa powder', 'amount': 0.75, 'unit': 'cup', 'is_optional': False},
-                    {'name': 'Eggs', 'amount': 2, 'unit': 'large', 'is_optional': False},
-                    {'name': 'Milk', 'amount': 1, 'unit': 'cup', 'is_optional': False},
-                    {'name': 'Vegetable oil', 'amount': 0.5, 'unit': 'cup', 'is_optional': False},
-                    {'name': 'Vanilla extract', 'amount': 1, 'unit': 'tsp', 'is_optional': True}
-                ]
-            },
-            {
-                'name': 'Vanilla Cupcakes',
-                'description': 'Light and fluffy vanilla cupcakes with buttercream frosting.',
-                'instructions': '1. Preheat oven to 350°F\n2. Mix ingredients\n3. Fill cupcake liners\n4. Bake for 20 minutes',
-                'image_path': '/static/images/default-recipe.jpg',
-                'dietary': 'Vegetarian',
-                'difficulty': 'Easy',
-                'serving_size': 12,
-                'prep_time': 15,
-                'cook_time': 20,
-                'total_time': 35,
-                'calories': 200,
-                'protein': 3,
-                'carbs': 30,
-                'fat': 8,
-                'fiber': 1,
-                'sugar': 20,
-                'cuisine_type': 'American',
-                'meal_type': 'Dessert',
-                'author': 'Baking App',
-                'rating': 4.3,
-                'review_count': 80,
-                'tips': '1. Use room temperature ingredients\n2. Don\'t overfill cupcake liners\n3. Let cool completely before frosting',
-                'storage_instructions': 'Store in an airtight container at room temperature for up to 2 days',
-                'equipment_needed': 'Mixing bowls, Whisk, Cupcake pan, Oven, Measuring cups',
-                'temperature': '350°F',
-                'source': 'Baking App Collection',
-                'ingredients': [
-                    {'name': 'All-purpose flour', 'amount': 1.5, 'unit': 'cups', 'is_optional': False},
-                    {'name': 'Sugar', 'amount': 1, 'unit': 'cup', 'is_optional': False},
-                    {'name': 'Eggs', 'amount': 2, 'unit': 'large', 'is_optional': False},
-                    {'name': 'Milk', 'amount': 0.75, 'unit': 'cup', 'is_optional': False},
-                    {'name': 'Butter', 'amount': 0.5, 'unit': 'cup', 'is_optional': False},
-                    {'name': 'Vanilla extract', 'amount': 1, 'unit': 'tsp', 'is_optional': True}
-                ]
-            }
-        ]
-        
-        # Insert recipes and their ingredients
-        for recipe_data in sample_recipes:
+        # Insert sample recipes from sample_recipes.py
+        for recipe_data in SAMPLE_RECIPES:
             # Remove ingredients from recipe data
-            ingredients = recipe_data.pop('ingredients')
+            ingredients = recipe_data.pop('ingredients', [])
             
             # Insert recipe
             cursor.execute('''
@@ -165,16 +89,19 @@ def init_sample_db():
                     tips, storage_instructions, equipment_needed, temperature, source
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
-                recipe_data['name'], recipe_data['description'], recipe_data['instructions'],
-                recipe_data['image_path'], recipe_data['dietary'], recipe_data['difficulty'],
-                recipe_data['serving_size'], recipe_data['prep_time'], recipe_data['cook_time'],
-                recipe_data['total_time'], recipe_data['calories'], recipe_data['protein'],
-                recipe_data['carbs'], recipe_data['fat'], recipe_data['fiber'],
-                recipe_data['sugar'], recipe_data['cuisine_type'], recipe_data['meal_type'],
-                recipe_data['author'], recipe_data['rating'], recipe_data['review_count'],
-                recipe_data['tips'], recipe_data['storage_instructions'],
-                recipe_data['equipment_needed'], recipe_data['temperature'],
-                recipe_data['source']
+                recipe_data['name'], recipe_data.get('description', ''),
+                recipe_data.get('instructions', ''), '/static/images/default-recipe.jpg',
+                recipe_data.get('dietary', 'Standard'), recipe_data.get('difficulty', 'Medium'),
+                recipe_data.get('servings', 4), recipe_data.get('prep_time', 30),
+                recipe_data.get('cook_time', 30), recipe_data.get('total_time', 60),
+                recipe_data.get('calories', 0), recipe_data.get('protein', 0),
+                recipe_data.get('carbs', 0), recipe_data.get('fat', 0),
+                recipe_data.get('fiber', 0), recipe_data.get('sugar', 0),
+                recipe_data.get('cuisine_type', 'General'), recipe_data.get('meal_type', 'Main'),
+                'Baking App', recipe_data.get('rating', 4.0), recipe_data.get('review_count', 0),
+                recipe_data.get('tips', ''), recipe_data.get('storage_instructions', ''),
+                recipe_data.get('equipment_needed', ''), recipe_data.get('temperature', ''),
+                'Baking App Collection'
             ))
             
             # Get the recipe ID
@@ -189,19 +116,18 @@ def init_sample_db():
                 ''', (
                     recipe_id, ingredient['name'],
                     ingredient['amount'], ingredient['unit'],
-                    ingredient['is_optional']
+                    ingredient.get('is_optional', False)
                 ))
         
         # Commit changes
         conn.commit()
-        logger.info("Sample database initialized successfully")
+        logger.info(f"Sample database initialized successfully with {len(SAMPLE_RECIPES)} recipes")
         
     except Exception as e:
         logger.error(f"Error initializing sample database: {e}")
         raise
     finally:
-        if conn:
-            conn.close()
+        conn.close()
 
 if __name__ == "__main__":
     init_sample_db() 
