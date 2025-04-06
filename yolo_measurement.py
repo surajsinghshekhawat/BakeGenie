@@ -8,6 +8,7 @@ import torch
 from ultralytics import YOLO
 import logging
 from database.ingredients_db import get_ingredient_by_name, get_measurement_by_name
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -17,23 +18,29 @@ class MeasurementDetector:
     def __init__(self):
         """Initialize the YOLO model and measurement system"""
         # Load YOLO model with custom configuration
-        self.model = YOLO('yolov8s.pt')  # Use small model for better accuracy
+        model_path = 'yolov8n.pt'  # Use nano model for faster detection
+        if not os.path.exists(model_path):
+            logger.error(f"YOLO model file not found: {model_path}")
+            raise FileNotFoundError(f"YOLO model file not found: {model_path}")
+            
+        self.model = YOLO(model_path)
+        logger.info(f"Loaded YOLO model from {model_path}")
         
         # Configure model parameters
-        self.model.conf = 0.3  # Lower confidence threshold for better detection
-        self.model.iou = 0.5   # IOU threshold
-        self.model.max_det = 5 # Maximum number of detections per frame
+        self.model.conf = 0.15  # Lower confidence threshold for better detection
+        self.model.iou = 0.4    # Lower IOU threshold
+        self.model.max_det = 20 # Increase maximum number of detections
         
         # Define measurement tool classes and their corresponding YOLO class IDs
-        # YOLO class IDs: spoon (44), bowl (45), cup (41)
+        # YOLO class IDs: spoon (44, 46, 47), bowl (45), cup (41)
         self.tool_classes = {
-            'measuring_spoon': [44],  # spoon class
+            'measuring_spoon': [44, 46, 47],  # multiple spoon classes
             'measuring_cup': [41, 45]  # cup and bowl classes
         }
         
         # Initialize detection cache
         self.last_detection = None
-        self.detection_confidence = 0.3  # Lower confidence threshold
+        self.detection_confidence = 0.15  # Lower confidence threshold
         
         logger.info("Measurement detector initialized with enhanced configuration")
     
@@ -58,11 +65,20 @@ class MeasurementDetector:
         
         for result in results:
             boxes = result.boxes
+            logger.info(f"Found {len(boxes)} detections")
+            
             for box in boxes:
                 # Get box coordinates and convert to integers
                 x1, y1, x2, y2 = map(int, box.xyxy[0].cpu().numpy())
                 confidence = float(box.conf.cpu().numpy()[0])
                 class_id = int(box.cls.cpu().numpy()[0])
+                
+                # Calculate aspect ratio
+                width = x2 - x1
+                height = y2 - y1
+                aspect_ratio = width / height if height > 0 else 0
+                
+                logger.info(f"Detection: class={class_id}, conf={confidence:.2f}, aspect_ratio={aspect_ratio:.2f}")
                 
                 # Determine tool type based on class ID
                 tool_type = None
@@ -71,13 +87,24 @@ class MeasurementDetector:
                         tool_type = tool
                         break
                 
-                if tool_type and confidence > self.detection_confidence:
-                    detection = {
-                        'bbox': (x1, y1, x2, y2),
-                        'confidence': float(confidence),
-                        'class': tool_type
-                    }
-                    detections.append(detection)
+                if tool_type:
+                    logger.info(f"Matched tool type: {tool_type}")
+                    # For spoons, check aspect ratio
+                    if 'spoon' in tool_type:
+                        if 0.3 < aspect_ratio < 3.0:  # More lenient aspect ratio check
+                            detection = {
+                                'bbox': (x1, y1, x2, y2),
+                                'confidence': float(confidence),
+                                'class': tool_type
+                            }
+                            detections.append(detection)
+                    else:
+                        detection = {
+                            'bbox': (x1, y1, x2, y2),
+                            'confidence': float(confidence),
+                            'class': tool_type
+                        }
+                        detections.append(detection)
                     
                     # Draw detection on debug frame
                     cv2.rectangle(debug_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
@@ -85,6 +112,7 @@ class MeasurementDetector:
                     cv2.putText(debug_frame, label, (x1, y1-10),
                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         
+        logger.info(f"Final number of detections: {len(detections)}")
         return detections, debug_frame
     
     def estimate_volume(self, frame, detection):
