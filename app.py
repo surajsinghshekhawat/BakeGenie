@@ -199,34 +199,23 @@ def process_image():
                 "message": "Invalid image data"
             })
         
-        # Process the image using our YOLOv8-based measurement system
+        # Process image with measurement detector
         result = measurement_detector.process_measurement(img, ingredient, measurement_type)
         
         if result['success']:
-            # Convert debug frame to base64
-            try:
-                _, buffer = cv2.imencode('.jpg', result['debug_frame'])
-                result['debug_image'] = f"data:image/jpeg;base64,{base64.b64encode(buffer).decode('utf-8')}"
-                del result['debug_frame']  # Remove OpenCV frame from response
-            except Exception as e:
-                logger.error(f"Error encoding debug image: {str(e)}")
-                result['debug_image'] = None
+            # Convert debug frame to base64 string
+            debug_frame = result['debug_frame']
+            _, buffer = cv2.imencode('.jpg', debug_frame)
+            debug_frame_b64 = base64.b64encode(buffer).decode('utf-8')
             
-            # Convert numpy values to Python native types
-            for key in ['volume_ml', 'weight_g', 'fill_percentage', 'confidence']:
-                if key in result and isinstance(result[key], (np.float32, np.float64, np.int32, np.int64)):
-                    result[key] = float(result[key])
+            # Update result with base64 image and remove original debug frame
+            result['debug_frame'] = debug_frame_b64
             
-            # Convert any remaining numpy arrays to lists
-            for key, value in list(result.items()):
-                if isinstance(value, np.ndarray):
-                    result[key] = value.tolist()
-                elif isinstance(value, (np.float32, np.float64, np.int32, np.int64)):
-                    result[key] = float(value)
-                elif isinstance(value, np.bool_):
-                    result[key] = bool(value)
-        
-        return jsonify(result)
+            return jsonify(result)
+        else:
+            result['debug_frame'] = None  # Remove debug frame if processing failed
+            return jsonify(result)
+            
     except Exception as e:
         logger.error(f"Error processing image: {str(e)}", exc_info=True)
         return jsonify({
@@ -574,4 +563,3 @@ def test_image():
 
 if __name__ == '__main__':
     app.run(debug=True)
-

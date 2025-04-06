@@ -177,8 +177,10 @@ class MeasurementDetector:
                 'debug_frame': debug_frame
             }
         
+        # Get density with fallback
+        density = ingredient_data.get('density', 1.0)  # Default density of 1.0 g/ml if not specified
+        
         # Calculate weight
-        density = ingredient_data['density']
         weight = actual_volume * density
         
         # Add measurement info to debug frame

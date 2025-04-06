@@ -656,7 +656,7 @@ endblock %} {% block head %}
       updateAverage();
 
       // Update detection overlay
-      if (result.debug_image) {
+      if (result.debug_frame) {
         const overlay = document.querySelector(".detection-overlay");
         const ctx = overlay.getContext("2d");
         const img = new Image();
@@ -665,7 +665,7 @@ endblock %} {% block head %}
           overlay.height = img.height;
           ctx.drawImage(img, 0, 0);
         };
-        img.src = result.debug_image;
+        img.src = "data:image/jpeg;base64," + result.debug_frame;
       }
 
       // Add to history
