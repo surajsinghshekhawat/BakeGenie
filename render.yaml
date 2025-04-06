@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: baking-recipe-app
+    name: bakegenie
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: chmod +x build.sh && ./build.sh
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.8.0
+        value: 3.11.0
       - key: GOOGLE_API_KEY
         sync: false
     healthCheckPath: /
