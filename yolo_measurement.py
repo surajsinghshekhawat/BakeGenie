@@ -22,16 +22,17 @@ class MeasurementDetector:
             self.model = YOLO('yolov8n.pt')
             logger.info("YOLO model loaded successfully")
             
-            # Configure model parameters - restore original working values
-            self.conf_threshold = 0.3    # Original confidence threshold
-            self.iou_threshold = 0.5     # Original IOU threshold
-            self.max_det = 5             # Original maximum detections
+            # Configure model parameters - make detection more lenient
+            self.conf_threshold = 0.1    # Lower confidence threshold
+            self.iou_threshold = 0.3     # Lower IOU threshold
+            self.max_det = 10            # More maximum detections
             
-            # Define measurement tool classes - restore original working IDs
-            self.spoon_classes = [44]    # Original spoon class ID
-            self.cup_classes = [45]      # Original cup class ID
+            # Define measurement tool classes (COCO dataset IDs)
+            # 44: spoon, 45: bowl, 46: banana, 47: apple, 48: sandwich, 49: orange
+            self.spoon_classes = [44, 45, 46, 47, 48, 49]  # More class IDs for spoons
+            self.cup_classes = [44, 45, 46, 47, 48, 49]    # More class IDs for cups
             
-            logger.info("Measurement detector initialized with original working configuration")
+            logger.info("Measurement detector initialized with enhanced configuration")
             
         except Exception as e:
             logger.error(f"Error initializing measurement detector: {e}")
@@ -61,16 +62,16 @@ class MeasurementDetector:
                 # Log detection details
                 logger.info(f"Detection: class={class_id}, conf={confidence:.2f}, ratio={aspect_ratio:.2f}")
                 
-                # Check if detection is a spoon - restore original ratio check
-                if class_id in self.spoon_classes and 0.3 < aspect_ratio < 3.0:
+                # Check if detection is a spoon (very lenient ratio)
+                if class_id in self.spoon_classes and 0.1 < aspect_ratio < 5.0:
                     spoons.append({
                         'bbox': (x1, y1, x2, y2),
                         'confidence': confidence,
                         'class_id': class_id
                     })
                 
-                # Check if detection is a cup - restore original ratio check
-                elif class_id in self.cup_classes and 0.5 < aspect_ratio < 2.0:
+                # Check if detection is a cup (very lenient ratio)
+                elif class_id in self.cup_classes and 0.1 < aspect_ratio < 5.0:
                     cups.append({
                         'bbox': (x1, y1, x2, y2),
                         'confidence': confidence,

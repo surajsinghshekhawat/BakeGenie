@@ -1,176 +1,139 @@
-## Prerequisites
+# BakeGenie — AI-powered Precision Baking Web App
 
-- Python 3.8 or higher
-- Kaggle API credentials
-- Required Python packages (see requirements.txt)
+BakeGenie is a web-based application that brings professional-grade precision into home baking. It combines computer vision, AI-based ingredient conversion, and recipe recommendation systems to help users measure ingredients accurately and explore new recipes based on their available ingredients.
 
-## Installation
+Built with a minimalistic and clean UI, BakeGenie is designed for efficiency, accuracy, and an enjoyable baking experience.
 
-1. Clone the repository:
+## 📌 Features
 
-```bash
-git clone <repository-url>
-cd recipe-assistant
+- **📸 AI Ingredient Measurement**
+
+  - Real-time container detection (cups, bowls, spoons) using a custom-trained YOLOv8 model.
+  - (WIP) Fill-level estimation using Mask R-CNN to predict the amount inside the container.
+  - Converts detected volume to gram measurements based on a dynamic ingredient density database.
+
+- **🧮 Ingredient Conversion (Manual Input)**
+
+  - Users manually select container size and ingredient type to get accurate gram equivalents.
+  - Supports conversion for a wide variety of ingredients like flour, sugar, butter, milk, etc.
+
+- **🤖 Smart Recipe Recommendations**
+  - Users input available ingredients.
+  - Gemini API-powered chatbot suggests personalized recipes.
+- **📚 Recipe Database Integration**
+
+  - Backend-ready integration of a processed Kaggle dataset with 200K+ recipes. (working on migrating from sample data to full Kaggle dataset)
+  - Search and display of detailed recipes, ingredients, and steps (currently sample database active).
+
+- **🛠️ Recipe Adjustment (Future)**
+
+  - Automatically scale recipe quantities based on available ingredient amounts.
+
+- **🎵 Productivity Enhancements (Planned)**
+  - Optional ambient sounds for a focused, fun baking environment.
+
+## 🚀 Tech Stack
+
+### Frontend
+
+- **HTML, CSS, JavaScript**
+- **getUserMedia API** (Web Camera access)
+- **Custom Vanilla JS Logic** (Dynamic UI interactions)
+
+### Backend
+
+- **Python (Flask or FastAPI)** — Web server and API endpoints
+- **YOLOv8 (Ultralytics)** — Real-time container detection
+- **Mask RCNN** (Training in Progress) — Container fill-level estimation
+- **Ingredient Density Engine** — Converts volume to mass for different ingredients
+- **Gemini API** — AI chatbot integration for recipe suggestions
+
+### Database
+
+- **Local JSON DB** — For ingredient densities
+- **Sample Recipes JSON DB** (Migrating to full Kaggle 200K+ recipes)
+
+### Tools & Infrastructure
+
+- **Google Colab + Roboflow** — Model training and augmentation
+- **Render / Netlify** — Hosting
+- **GitHub** — Version control
+- **Figma** — UI prototyping
+- **Firebase** _(planned)_ — User authentication and storage (optional future integration)
+
+## 🏗️ Project Architecture
+
+```
+[Frontend (HTML/CSS/JS)]
+    ↓
+[Camera access + Container Detection (YOLOv8 API)]
+    ↓
+[Fill-Level Measurement (RCNN API)]
+    ↓
+[Density-based Conversion Logic (Backend)]
+    ↓
+[Recipe Suggestion System (Gemini API)]
+    ↓
+[Frontend Displays Result / Suggests Recipes]
 ```
 
-2. Create and activate a virtual environment:
+## ⚡ Future Enhancements
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+- 🔬 Real-time fill-level prediction using instance segmentation on mobile.
+- 📱 Build a PWA (Progressive Web App) version.
+- 🧠 Fine-tune AI chatbot specifically for baking advice and nutritional breakdown.
+- 🔗 Connect with smart scales and kitchen appliances.
+- 📥 Allow users to save, modify, and share custom recipes.
+- 🎤 Voice-command based baking assistant.
+- 🍎 Nutrition value calculator based on ingredients.
 
-3. Install required packages:
+## 🛠️ Installation & Setup
 
-```bash
-pip install -r requirements.txt
-```
+> Prerequisites: Python 3.10, Node.js (for frontend local server), pip
 
-4. Set up Kaggle API credentials:
-   - Go to your Kaggle account settings
-   - Click on "Create New API Token"
-   - Save the downloaded kaggle.json file
-   - Place it in ~/.kaggle/kaggle.json (Windows: C:\Users\<username>\.kaggle\kaggle.json)
-   - Set appropriate permissions:
-     ```bash
-     chmod 600 ~/.kaggle/kaggle.json  # On Unix-based systems
-     ```
+1. **Clone the repository**
 
-## Usage
+   ```bash
+   git clone https://github.com/yourusername/bakewise.git
+   cd bakewise
+   ```
 
-1. Initialize the database:
+2. **Install backend dependencies**
 
-```bash
-python -m database.recipes_db
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-2. Download and process datasets:
+3. **Run backend server**
 
-```bash
-python -m database.dataset_processor
-```
+   ```bash
+   python app.py
+   ```
 
-3. Import processed recipes into the database:
+4. **Run frontend**
 
-```bash
-python -m database.recipes_db import_recipes_from_csv datasets/epicurious/processed_recipes.csv
-```
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
 
-## Dataset Sources
+5. **Access the app**
+   - Open browser and navigate to: `http://localhost:3000`
 
-The system processes recipes from the following Kaggle datasets:
+---
 
-1. Epicurious Recipes Dataset
+## 🤝 Contribution Guidelines
 
-   - Contains recipes with ratings and nutritional information
-   - Source: https://www.kaggle.com/hugodarwood/epicurious-recipes-with-rating-and-nutritional-information
+- Fork this repo
+- Create a new branch (`git checkout -b feature/yourFeature`)
+- Commit your changes (`git commit -m 'Add some feature'`)
+- Push to the branch (`git push origin feature/yourFeature`)
+- Open a Pull Request 🚀
 
-2. Food.com Recipes and Interactions Dataset
+---
 
-   - Includes recipes and user interactions
-   - Source: https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions
+## 📜 License
 
-3. Food Recipes Dataset
-   - Comprehensive collection of recipes
-   - Source: https://www.kaggle.com/shuyangli94/food-recipes-dataset
-
-## Data Processing
-
-The system performs the following processing steps:
-
-1. Data Cleaning
-
-   - Remove duplicates
-   - Standardize formats
-   - Handle missing values
-   - Validate data
-
-2. Feature Extraction
-
-   - Estimate recipe difficulty
-   - Generate cooking tips
-   - Process nutritional information
-   - Extract equipment requirements
-
-3. Data Standardization
-   - Convert measurements
-   - Normalize ingredient names
-   - Standardize instructions format
-   - Categorize recipes
-
-## Database Schema
-
-### Recipes Table
-
-- id (PRIMARY KEY)
-- name
-- description
-- instructions
-- image_path
-- dietary
-- difficulty
-- serving_size
-- prep_time
-- cook_time
-- total_time
-- calories
-- protein
-- carbs
-- fat
-- fiber
-- sugar
-- cuisine_type
-- meal_type
-- author
-- rating
-- review_count
-- tips
-- storage_instructions
-- equipment_needed
-- temperature
-- source
-
-### Recipe Ingredients Table
-
-- id (PRIMARY KEY)
-- recipe_id (FOREIGN KEY)
-- ingredient_name
-- amount
-- unit
-- notes
-- substitute
-- is_optional
-- category
-- preparation
-
-## Error Handling
-
-The system includes comprehensive error handling for:
-
-- API authentication issues
-- Data download failures
-- Processing errors
-- Database operations
-- Invalid data formats
-
-## Logging
-
-Logs are generated for:
-
-- Dataset downloads
-- Processing steps
-- Database operations
-- Errors and warnings
-- Successful completions
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+Distributed under the MIT License.  
+See `LICENSE` for more information.
