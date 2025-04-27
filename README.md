@@ -56,26 +56,16 @@ Built with a minimalistic and clean UI, BakeGenie is designed for efficiency, ac
 ### Tools & Infrastructure
 
 - **Google Colab + Roboflow** — Model training and augmentation
-- **Render / Netlify** — Hosting
+- **Render ** — Hosting
 - **GitHub** — Version control
 - **Figma** — UI prototyping
 - **Firebase** _(planned)_ — User authentication and storage (optional future integration)
 
 ## 🏗️ Project Architecture
 
-```
-[Frontend (HTML/CSS/JS)]
-    ↓
-[Camera access + Container Detection (YOLOv8 API)]
-    ↓
-[Fill-Level Measurement (RCNN API)]
-    ↓
-[Density-based Conversion Logic (Backend)]
-    ↓
-[Recipe Suggestion System (Gemini API)]
-    ↓
-[Frontend Displays Result / Suggests Recipes]
-```
+![Architechure Diagram](image1.png)
+---------------------------------------
+![process flow diagram](image.png)
 
 ## ⚡ Future Enhancements
 
@@ -94,8 +84,8 @@ Built with a minimalistic and clean UI, BakeGenie is designed for efficiency, ac
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/bakewise.git
-   cd bakewise
+   git clone https://github.com/surajsinghshekhawat/BakeGenie
+   cd bakegenie
    ```
 
 2. **Install backend dependencies**
