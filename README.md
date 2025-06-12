@@ -99,15 +99,17 @@ Built with a minimalistic and clean UI, BakeGenie is designed for efficiency, ac
    The application uses a custom-trained model for ingredient measurement. You have two options to set it up:
 
    **Option 1: Automatic Download (Recommended)**
-
    - The app will automatically download the model file when you first run it
    - No manual steps required
 
    **Option 2: Manual Download**
-
-   - Download the model file directly from: [Model Download Link](https://drive.google.com/uc?export=download&id=1VaB9qmln89nWr74fhceatvvaTqUQMgqU)
+   - Install gdown: `pip install gdown`
+   - Download the model file using gdown:
+     ```bash
+     gdown https://drive.google.com/uc?id=1VaB9qmln89nWr74fhceatvvaTqUQMgqU
+     ```
    - Create a `models` folder in the project root if it doesn't exist
-   - Place the downloaded `checkpoint.pth` file in the `models` folder
+   - Move the downloaded `checkpoint.pth` file to the `models` folder
 
 4. **Run backend server**
 

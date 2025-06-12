@@ -17,4 +17,5 @@ kaggle==1.5.12
 SQLAlchemy==1.4.23
 sympy==1.12
 pycocotools>=2.0.6
-tqdm>=4.65.0 
+tqdm>=4.65.0
+gdown>=4.7.1 
