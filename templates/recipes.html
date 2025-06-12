@@ -89,6 +89,69 @@
     font-size: 3rem;
     margin-bottom: var(--spacing-md);
   }
+
+  .recipe-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+    color: white;
+    display: inline-block;
+  }
+
+  .recipe-badge.vegetarian {
+    background-color: #4caf50;
+  }
+
+  .recipe-badge.non-vegetarian {
+    background-color: #ef5350;
+  }
+
+  .difficulty {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+    color: white;
+    display: inline-block;
+  }
+
+  .difficulty.easy {
+    background-color: #4caf50;
+  }
+
+  .difficulty.medium {
+    background-color: #ffa726;
+  }
+
+  .difficulty.hard {
+    background-color: #ef5350;
+  }
+
+  .recipe-meta {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .recipe-meta span {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  .prep-time,
+  .servings {
+    color: var(--text-light);
+  }
+
+  .recipe-image {
+    position: relative;
+  }
 </style>
 {% endblock %} {% block content %}
 <section class="recipes-container">
@@ -303,6 +366,9 @@
         emptyResults.style.display = "none";
       }
     }
+
+    // Initialize filters
+    applyFilters();
   });
 </script>
 {% endblock %}

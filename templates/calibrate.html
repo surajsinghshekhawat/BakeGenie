@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calibrate Measuring Tools</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      .calibration-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .calibration-steps {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .calibration-step {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-left: 4px solid var(--primary-color);
+        background: #f8f9fa;
+      }
+
+      .calibration-step h3 {
+        margin: 0 0 10px 0;
+        color: var(--primary-color);
+      }
+
+      .calibration-step p {
+        margin: 0;
+        color: #666;
+      }
+
+      .measurement-input {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .input-group label {
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      .input-group input {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .camera-view {
+        position: relative;
+        margin: 20px 0;
+      }
+
+      .camera-view video {
+        width: 100%;
+        border-radius: 8px;
+      }
+
+      .camera-view canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .calibration-controls {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .calibration-results {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .calibration-results h3 {
+        margin: 0 0 10px 0;
+        color: var(--primary-color);
+      }
+
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+      }
+
+      .result-item {
+        padding: 10px;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-item .label {
+        font-size: 0.9em;
+        color: #666;
+      }
+
+      .result-item .value {
+        font-size: 1.2em;
+        font-weight: 500;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calibration-container">
+      <h1>Calibrate Measuring Tools</h1>
+
+      <div class="calibration-steps">
+        <div class="calibration-step">
+          <h3>Step 1: Select Measuring Tool</h3>
+          <p>Choose the measuring tool you want to calibrate</p>
+          <select id="tool-select" class="form-control">
+            <option value="small_cup">Small Cup (240ml)</option>
+            <option value="large_cup">Large Cup (480ml)</option>
+            <option value="mixing_bowl">Mixing Bowl (1000ml)</option>
+            <option value="small_spoon">Small Spoon (5ml)</option>
+            <option value="tablespoon">Tablespoon (15ml)</option>
+            <option value="teaspoon">Teaspoon (5ml)</option>
+          </select>
+        </div>
+
+        <div class="calibration-step">
+          <h3>Step 2: Prepare Calibration</h3>
+          <p>Fill the measuring tool with water to the following levels:</p>
+          <div class="measurement-input">
+            <div class="input-group">
+              <label>25% Full</label>
+              <input type="number" id="volume-25" placeholder="Volume in ml" />
+            </div>
+            <div class="input-group">
+              <label>50% Full</label>
+              <input type="number" id="volume-50" placeholder="Volume in ml" />
+            </div>
+            <div class="input-group">
+              <label>75% Full</label>
+              <input type="number" id="volume-75" placeholder="Volume in ml" />
+            </div>
+            <div class="input-group">
+              <label>100% Full</label>
+              <input type="number" id="volume-100" placeholder="Volume in ml" />
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-step">
+          <h3>Step 3: Capture Measurements</h3>
+          <p>
+            Position the measuring tool in front of the camera and capture each
+            fill level
+          </p>
+          <div class="camera-view">
+            <video id="camera-feed" autoplay playsinline></video>
+            <canvas id="detection-overlay"></canvas>
+          </div>
+          <div class="calibration-controls">
+            <button id="start-camera" class="btn btn-primary">
+              Start Camera
+            </button>
+            <button id="capture-25" class="btn btn-secondary" disabled>
+              Capture 25%
+            </button>
+            <button id="capture-50" class="btn btn-secondary" disabled>
+              Capture 50%
+            </button>
+            <button id="capture-75" class="btn btn-secondary" disabled>
+              Capture 75%
+            </button>
+            <button id="capture-100" class="btn btn-secondary" disabled>
+              Capture 100%
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="calibration-results" style="display: none">
+        <h3>Calibration Results</h3>
+        <div class="results-grid">
+          <div class="result-item">
+            <div class="label">Tool Type</div>
+            <div class="value" id="result-tool">-</div>
+          </div>
+          <div class="result-item">
+            <div class="label">Calibration Status</div>
+            <div class="value" id="result-status">-</div>
+          </div>
+          <div class="result-item">
+            <div class="label">Confidence</div>
+            <div class="value" id="result-confidence">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const toolSelect = document.getElementById("tool-select");
+        const startCameraBtn = document.getElementById("start-camera");
+        const captureButtons = [
+          document.getElementById("capture-25"),
+          document.getElementById("capture-50"),
+          document.getElementById("capture-75"),
+          document.getElementById("capture-100"),
+        ];
+        const volumeInputs = [
+          document.getElementById("volume-25"),
+          document.getElementById("volume-50"),
+          document.getElementById("volume-75"),
+          document.getElementById("volume-100"),
+        ];
+
+        let stream = null;
+        let currentFillLevel = 0;
+        const fillLevels = [25, 50, 75, 100];
+        const measurements = [];
+
+        // Start camera
+        startCameraBtn.addEventListener("click", async function () {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            document.getElementById("camera-feed").srcObject = stream;
+            startCameraBtn.disabled = true;
+            captureButtons.forEach((btn) => (btn.disabled = false));
+          } catch (error) {
+            console.error("Error accessing camera:", error);
+            alert(
+              "Error accessing camera. Please ensure camera permissions are granted."
+            );
+          }
+        });
+
+        // Capture measurements
+        captureButtons.forEach((btn, index) => {
+          btn.addEventListener("click", async function () {
+            const video = document.getElementById("camera-feed");
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0);
+
+            const imageData = canvas.toDataURL("image/jpeg", 0.8);
+            const volume = parseFloat(volumeInputs[index].value);
+
+            if (isNaN(volume) || volume <= 0) {
+              alert("Please enter a valid volume for this fill level");
+              return;
+            }
+
+            try {
+              const response = await fetch("/api/calibrate", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  image: imageData,
+                  tool_type: toolSelect.value,
+                  fill_level: fillLevels[index],
+                  volume: volume,
+                }),
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                measurements[index] = {
+                  fill_level: fillLevels[index],
+                  volume: volume,
+                  pixel_height: result.pixel_height,
+                };
+
+                btn.disabled = true;
+                btn.textContent = "✓ Captured";
+
+                // Check if all measurements are complete
+                if (measurements.filter((m) => m).length === 4) {
+                  showCalibrationResults();
+                }
+              } else {
+                alert(result.message || "Error capturing measurement");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("Error processing measurement");
+            }
+          });
+        });
+
+        function showCalibrationResults() {
+          const resultsDiv = document.querySelector(".calibration-results");
+          resultsDiv.style.display = "block";
+
+          document.getElementById("result-tool").textContent = toolSelect.value;
+          document.getElementById("result-status").textContent = "Calibrated";
+          document.getElementById("result-confidence").textContent = "High";
+
+          // Save calibration data
+          saveCalibrationData();
+        }
+
+        async function saveCalibrationData() {
+          try {
+            const response = await fetch("/api/save_calibration", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                tool_type: toolSelect.value,
+                measurements: measurements,
+              }),
+            });
+
+            const result = await response.json();
+            if (!result.success) {
+              alert("Error saving calibration data");
+            }
+          } catch (error) {
+            console.error("Error saving calibration:", error);
+            alert("Error saving calibration data");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

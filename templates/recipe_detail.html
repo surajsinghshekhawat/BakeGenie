@@ -431,6 +431,76 @@ block head %}
       gap: 15px;
     }
   }
+
+  .recipe-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+
+  .nutrition-info,
+  .equipment-needed {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .nutrition-info:hover,
+  .equipment-needed:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .nutrition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+
+  .equipment-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .equipment-item {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    padding: 12px 15px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: #666;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .equipment-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .equipment-item i {
+    color: var(--primary-color);
+  }
+
+  @media (max-width: 768px) {
+    .recipe-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .nutrition-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .equipment-list {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 {% endblock %} {% block content %}
 <div class="recipe-container">
@@ -468,6 +538,10 @@ block head %}
       <div class="meta-item">
         <i class="fas fa-utensils"></i>
         {{ recipe.cuisine_type }}
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-leaf"></i>
+        {{ recipe.dietary|capitalize }}
       </div>
       <div class="meta-item recipe-rating">
         <div class="stars">
@@ -515,6 +589,15 @@ block head %}
         </li>
         {% endfor %}
       </ul>
+    </div>
+
+    <div class="recipe-main">
+      <h2 class="section-title">Instructions</h2>
+      <ol class="instructions-list">
+        {% for step in recipe.instructions %}
+        <li class="instruction-item">{{ step }}</li>
+        {% endfor %}
+      </ol>
 
       <div class="nutrition-info">
         <h2 class="section-title">Nutrition</h2>
@@ -549,33 +632,35 @@ block head %}
       <div class="equipment-needed">
         <h2 class="section-title">Equipment Needed</h2>
         <div class="equipment-list">
-          {% for item in recipe.equipment_needed.split(', ') %}
+          {% for item in recipe.equipment_needed.split('•') %} {% if
+          item.strip() %}
           <div class="equipment-item">
-            <i class="fas fa-utensil-spoon"></i> {{ item }}
+            {% set lower_item = item.lower() %} {% if 'bowl' in lower_item %}
+            <i class="fas fa-utensil-spoon"></i>
+            {% elif 'mixer' in lower_item or 'blender' in lower_item %}
+            <i class="fas fa-blender"></i>
+            {% elif 'oven' in lower_item %}
+            <i class="fas fa-fire"></i>
+            {% elif 'pan' in lower_item or 'loaf' in lower_item %}
+            <i class="fas fa-bread-slice"></i>
+            {% elif 'whisk' in lower_item %}
+            <i class="fas fa-utensil-spoon"></i>
+            {% elif 'spatula' in lower_item or 'spoon' in lower_item %}
+            <i class="fas fa-utensil-spoon"></i>
+            {% elif 'knife' in lower_item %}
+            <i class="fas fa-knife"></i>
+            {% elif 'sheet' in lower_item or 'tray' in lower_item %}
+            <i class="fas fa-square"></i>
+            {% elif 'rack' in lower_item %}
+            <i class="fas fa-grip-lines"></i>
+            {% elif 'measuring' in lower_item or 'scale' in lower_item %}
+            <i class="fas fa-balance-scale"></i>
+            {% else %}
+            <i class="fas fa-utensil-spoon"></i>
+            {% endif %} {{ item.strip() }}
           </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-
-    <div class="recipe-main">
-      <h2 class="section-title">Instructions</h2>
-      <ol class="instructions-list">
-        {% for step in recipe.instructions %}
-        <li class="instruction-item">{{ step }}</li>
-        {% endfor %}
-      </ol>
-
-      <div class="recipe-tips">
-        <h2 class="section-title">Pro Tips</h2>
-        <ul class="tips-list">
-          {% for tip in recipe.tips.split('. ') %} {% if tip.strip() %}
-          <li class="tip-item">
-            <i class="fas fa-lightbulb"></i>
-            <span>{{ tip.strip() }}</span>
-          </li>
           {% endif %} {% endfor %}
-        </ul>
+        </div>
       </div>
 
       <div class="storage-instructions">

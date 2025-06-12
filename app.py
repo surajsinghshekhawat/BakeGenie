@@ -16,14 +16,14 @@ from ultralytics import YOLO
 import torch
 import torchvision
 from dotenv import load_dotenv
+from utils.calibration import calibrator
+from utils.measurement_detector import MeasurementDetector
+from utils.rcnn_measurement_system import RCNNMeasurementSystem
 
 # Import our database modules
 from database.ingredients_db import get_all_ingredients, get_ingredient_by_name, get_all_measurements, get_measurement_by_name, init_ingredients_db
 from database.recipes_db import get_all_recipes, get_recipe_by_id, search_recipes, find_recipes_by_ingredients, init_recipes_db
 from init_databases import init_all_databases
-
-# Import measurement module
-from yolo_measurement import MeasurementDetector
 
 # Load environment variables
 load_dotenv()
@@ -59,13 +59,19 @@ yolo_model = YOLO('yolov8n.pt')
 # Initialize measurement detector
 measurement_detector = MeasurementDetector()
 
-# Initialize databases
+# Initialize RCNN measurement system
 try:
-    init_all_databases()
-    logger.info("Databases initialized successfully")
+    checkpoint_path = os.path.join('models', 'checkpoint.pth')
+    if not os.path.exists(checkpoint_path):
+        logger.warning(f"No checkpoint found at {checkpoint_path}. Using default model.")
+        rcnn_measurement = RCNNMeasurementSystem()
+    else:
+        logger.info(f"Loading checkpoint from {checkpoint_path}")
+        rcnn_measurement = RCNNMeasurementSystem(checkpoint_path)
 except Exception as e:
-    logger.error(f"Error initializing databases: {e}")
-    raise
+    logger.error(f"Error initializing RCNN: {e}")
+    logger.info("Initializing RCNN with default model")
+    rcnn_measurement = RCNNMeasurementSystem()
 
 # Cache for frequently accessed data
 @lru_cache(maxsize=100)
@@ -170,6 +176,69 @@ def get_ingredient_details_api():
         return jsonify(formatted_ingredient)
     return jsonify({"error": "Ingredient not found"}), 404
 
+@app.route('/api/upload_photo', methods=['POST'])
+def upload_photo():
+    try:
+        if 'photo' not in request.files:
+            return jsonify({
+                'success': False,
+                'message': 'No photo uploaded'
+            })
+            
+        photo = request.files['photo']
+        if photo.filename == '':
+            return jsonify({
+                'success': False,
+                'message': 'No selected file'
+            })
+            
+        # Get measurement parameters
+        container_type = request.form.get('container_type')
+        ingredient_type = request.form.get('ingredient_type')
+        
+        if not container_type or not ingredient_type:
+            return jsonify({
+                'success': False,
+                'message': 'Missing container or ingredient type'
+            })
+            
+        # Save the uploaded file
+        filename = secure_filename(photo.filename)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{timestamp}_{filename}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        photo.save(filepath)
+        
+        # Process the measurement using RCNN
+        result = rcnn_measurement.process_measurement(filepath, container_type, ingredient_type)
+        
+        if not result['success']:
+            return jsonify({
+                'success': False,
+                'message': result.get('message', 'Failed to process measurement')
+            })
+        
+        # Get ingredient density for weight calculation
+        ingredient_data = get_ingredient_by_name(ingredient_type)
+        if ingredient_data and 'base_density' in ingredient_data:
+            density = float(ingredient_data['base_density'])
+            volume_ml = float(result['volume'].replace('ml', ''))
+            weight = volume_ml * density
+            result['weight_g'] = f"{weight:.1f}g"
+        
+        # Add debug image path
+        result['debug_image'] = f'/static/uploads/{filename}'
+        result['success'] = True
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Error processing photo upload: {e}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
+
 @app.route('/api/process_image', methods=['POST'])
 def process_image():
     try:
@@ -190,8 +259,8 @@ def process_image():
                 "message": "Invalid image data format"
             })
             
-        ingredient = data.get('ingredient', 'flour')
-        measurement_type = data.get('measurement_type', 'cup')
+        container_type = data.get('container_type', 'teaspoon')
+        ingredient_type = data.get('ingredient_type', 'flour')
         
         # Convert base64 to image
         try:
@@ -206,28 +275,34 @@ def process_image():
                 "message": "Invalid image data"
             })
         
-        # Process image with measurement detector
-        result = measurement_detector.process_measurement(img, ingredient, measurement_type)
+        # Save temporary image
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        temp_filename = f"temp_{timestamp}.jpg"
+        temp_filepath = os.path.join(app.config['UPLOAD_FOLDER'], temp_filename)
+        cv2.imwrite(temp_filepath, img)
+        
+        # Process measurement using RCNN
+        result = rcnn_measurement.process_measurement(temp_filepath, container_type, ingredient_type)
         
         if result['success']:
-            # Convert debug frame to base64 string
-            debug_frame = result['debug_frame']
-            _, buffer = cv2.imencode('.jpg', debug_frame)
-            debug_frame_b64 = base64.b64encode(buffer).decode('utf-8')
+            # Get ingredient density for weight calculation
+            ingredient_data = get_ingredient_by_name(ingredient_type)
+            if ingredient_data and 'base_density' in ingredient_data:
+                density = float(ingredient_data['base_density'])
+                volume_ml = float(result['volume'].replace('ml', ''))
+                weight = volume_ml * density
+                result['weight_g'] = f"{weight:.1f}g"
             
-            # Update result with base64 image and remove original debug frame
-            result['debug_frame'] = debug_frame_b64
-            
-            return jsonify(result)
-        else:
-            result['debug_frame'] = None  # Remove debug frame if processing failed
-            return jsonify(result)
-            
+            # Add debug image path
+            result['debug_image'] = f'/static/uploads/{temp_filename}'
+        
+        return jsonify(result)
+        
     except Exception as e:
-        logger.error(f"Error processing image: {str(e)}", exc_info=True)
+        logger.error(f"Error processing image: {e}")
         return jsonify({
             "success": False,
-            "message": f"Error processing image: {str(e)}"
+            "message": str(e)
         })
 
 @app.route('/api/chat_recipe_suggestions', methods=['POST'])
@@ -567,6 +642,77 @@ def test_image():
             return f"Image not found at: {image_path}", 404
     except Exception as e:
         return f"Error: {str(e)}", 500
+
+@app.route('/calibrate')
+def calibrate_page():
+    return render_template('calibrate.html')
+
+@app.route('/api/calibrate', methods=['POST'])
+def calibrate():
+    try:
+        data = request.json
+        image_data = data['image'].split(',')[1]  # Remove data URL prefix
+        image_bytes = base64.b64decode(image_data)
+        nparr = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        # Process image to get pixel height
+        result = measurement_detector.process_measurement(image)
+        
+        if not result['success']:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to detect measuring tool'
+            })
+        
+        return jsonify({
+            'success': True,
+            'pixel_height': result['pixel_height']
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
+
+@app.route('/api/save_calibration', methods=['POST'])
+def save_calibration():
+    try:
+        data = request.json
+        tool_type = data['tool_type']
+        measurements = data['measurements']
+        
+        # Sort measurements by fill level
+        measurements.sort(key=lambda x: x['fill_level'])
+        
+        # Extract pixel heights and volumes
+        pixel_heights = [m['pixel_height'] for m in measurements]
+        volumes = [m['volume'] for m in measurements]
+        
+        # Calibrate the tool
+        success = calibrator.calibrate_container(
+            tool_type=tool_type,
+            pixel_heights=pixel_heights,
+            volumes=volumes
+        )
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Calibration saved successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to save calibration'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
 
 if __name__ == '__main__':
     app.run(debug=True)
