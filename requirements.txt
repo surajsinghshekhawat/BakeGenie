@@ -1,15 +1,15 @@
 Flask==3.0.2
 Werkzeug==3.0.1
 --only-binary=numpy
-numpy>=1.19.0
-opencv-python>=4.5.0
+numpy==1.24.3
+opencv-python==4.11.0.86
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch>=1.9.0
-torchvision>=0.10.0
+torch==2.4.1
+torchvision==0.19.1
 ultralytics==8.1.28
 google-generativeai==0.3.2
 python-dotenv==1.0.1
-Pillow>=8.0.0
+Pillow==11.2.1
 gunicorn==21.2.0
 requests>=2.31.0
 pandas==2.0.3
@@ -18,4 +18,7 @@ SQLAlchemy==1.4.23
 sympy==1.12
 pycocotools>=2.0.6
 tqdm>=4.65.0
-gdown>=4.7.1 
+gdown==5.2.0
+matplotlib==3.10.3
+seaborn==0.13.2
+scipy==1.15.3 
