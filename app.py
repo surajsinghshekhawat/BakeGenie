@@ -110,6 +110,25 @@ def index():
         logger.error(f"Error rendering index: {e}")
         return render_template('error.html', error="Failed to load recipes")
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint"""
+    try:
+        # Check if model exists
+        model_exists = os.path.exists('models/checkpoint.pth')
+        return jsonify({
+            'status': 'healthy',
+            'model_loaded': model_exists,
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return jsonify({
+            'status': 'unhealthy',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
 @app.route('/measure')
 def measure():
     ingredients = get_cached_ingredients()

@@ -25,9 +25,15 @@ RUN mkdir -p static/uploads models
 # Set environment variables
 ENV PORT=8080
 ENV PYTHONUNBUFFERED=1
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
 
 # Expose the port
 EXPOSE 8080
 
-# Command to run the application
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app 
+# Add a health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/ || exit 1
+
+# Command to run the application with logging
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 --log-level debug app:app 
