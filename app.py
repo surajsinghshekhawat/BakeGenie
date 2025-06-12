@@ -55,12 +55,6 @@ genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('models/gemini-1.5-pro')
 chat_model = genai.GenerativeModel('models/gemini-1.5-pro')
 
-# Initialize YOLOv8 model with smaller model
-yolo_model = YOLO('yolov8n.pt')  # Using nano model for memory efficiency
-
-# Initialize measurement detector
-measurement_detector = MeasurementDetector()
-
 # Initialize RCNN measurement system
 try:
     checkpoint_path = os.path.join('models', 'checkpoint.pth')
@@ -69,12 +63,20 @@ try:
         rcnn_measurement = RCNNMeasurementSystem()
     else:
         logger.info(f"Loading checkpoint from {checkpoint_path}")
-        # Load model with weights_only=True for security and memory efficiency
+        # Load model with weights_only=True and clear cache
+        torch.cuda.empty_cache() if torch.cuda.is_available() else None
         rcnn_measurement = RCNNMeasurementSystem(checkpoint_path, weights_only=True)
 except Exception as e:
     logger.error(f"Error initializing RCNN: {e}")
     logger.info("Initializing RCNN with default model")
     rcnn_measurement = RCNNMeasurementSystem()
+
+# Initialize YOLOv8 model with smaller model and clear cache
+torch.cuda.empty_cache() if torch.cuda.is_available() else None
+yolo_model = YOLO('yolov8n.pt')  # Using nano model for memory efficiency
+
+# Initialize measurement detector
+measurement_detector = MeasurementDetector()
 
 # Cache for frequently accessed data
 @lru_cache(maxsize=100)
