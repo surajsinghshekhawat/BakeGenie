@@ -2,16 +2,14 @@ services:
   - type: web
     name: bakegenie
     env: python
-    buildCommand: chmod +x .renderbuild.sh && ./.renderbuild.sh
-    startCommand: source .venv/bin/activate && gunicorn app:app
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.13
-      - key: PIP_NO_BUILD_ISOLATION
-        value: "true"
-      - key: PIP_ONLY_BINARY
-        value: ":all:"
+        value: 3.10.0
+      - key: FLASK_ENV
+        value: production
       - key: GOOGLE_API_KEY
         sync: false
-    healthCheckPath: /
+    healthCheckPath: /health
     autoDeploy: true
