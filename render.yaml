@@ -5,7 +5,7 @@ services:
     buildCommand: |
       python -m pip install --upgrade pip
       pip install -r requirements.txt
-    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.13
@@ -17,3 +17,10 @@ services:
         value: 10000
     healthCheckPath: /health
     autoDeploy: true
+    plan: standard
+    scaling:
+      minInstances: 1
+      maxInstances: 1
+    resources:
+      memory: 2GB
+      cpu: 1
