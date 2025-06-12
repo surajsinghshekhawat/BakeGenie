@@ -74,3 +74,12 @@ static/uploads/
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Model files
+models/checkpoint.pth
+*.pth
+*.pt
+*.h5
+*.hdf5
+*.weights
+*.model
