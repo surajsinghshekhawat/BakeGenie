@@ -63,17 +63,14 @@ try:
         rcnn_measurement = RCNNMeasurementSystem()
     else:
         logger.info(f"Loading checkpoint from {checkpoint_path}")
-        # Load model with weights_only=True and clear cache
-        torch.cuda.empty_cache() if torch.cuda.is_available() else None
-        rcnn_measurement = RCNNMeasurementSystem(checkpoint_path, weights_only=True)
+        rcnn_measurement = RCNNMeasurementSystem(checkpoint_path)
 except Exception as e:
     logger.error(f"Error initializing RCNN: {e}")
     logger.info("Initializing RCNN with default model")
     rcnn_measurement = RCNNMeasurementSystem()
 
-# Initialize YOLOv8 model with smaller model and clear cache
-torch.cuda.empty_cache() if torch.cuda.is_available() else None
-yolo_model = YOLO('yolov8n.pt')  # Using nano model for memory efficiency
+# Initialize YOLOv8 model
+yolo_model = YOLO('yolov8n.pt')
 
 # Initialize measurement detector
 measurement_detector = MeasurementDetector()
