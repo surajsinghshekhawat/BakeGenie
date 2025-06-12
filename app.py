@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 from utils.calibration import calibrator
 from utils.measurement_detector import MeasurementDetector
 from utils.rcnn_measurement_system import RCNNMeasurementSystem
+import requests
 
 # Import our database modules
 from database.ingredients_db import get_all_ingredients, get_ingredient_by_name, get_all_measurements, get_measurement_by_name, init_ingredients_db
@@ -77,6 +78,36 @@ except Exception as e:
 @lru_cache(maxsize=100)
 def get_cached_ingredients():
     return [ingredient['name'] for ingredient in get_all_ingredients()]
+
+# Model download configuration
+MODEL_PATH = 'models/checkpoint.pth'
+MODEL_URL = 'https://drive.google.com/uc?export=download&id=1VaB9qmln89nWr74fhceatvvaTqUQMgqU'
+
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        print("Model not found. Downloading...")
+        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+        
+        # Google Drive direct download
+        session = requests.Session()
+        response = session.get(MODEL_URL, stream=True)
+        
+        # Get the confirmation token if needed
+        for key, value in response.cookies.items():
+            if key.startswith('download_warning'):
+                params = {'id': MODEL_URL.split('id=')[1], 'confirm': value}
+                response = session.get('https://drive.google.com/uc', params=params, stream=True)
+                break
+        
+        # Download the file
+        with open(MODEL_PATH, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+        print("Model downloaded successfully!")
+
+# Download model if not present
+download_model()
 
 @app.route('/')
 def index():
