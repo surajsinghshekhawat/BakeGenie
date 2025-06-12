@@ -63,8 +63,8 @@ Built with a minimalistic and clean UI, BakeGenie is designed for efficiency, ac
 
 ## 🏗️ Project Architecture
 
-![Architechure Diagram](image1.png)
----------------------------------------
+## ![Architechure Diagram](image1.png)
+
 ![process flow diagram](image.png)
 
 ## ⚡ Future Enhancements
@@ -94,13 +94,28 @@ Built with a minimalistic and clean UI, BakeGenie is designed for efficiency, ac
    pip install -r requirements.txt
    ```
 
-3. **Run backend server**
+3. **Model File Setup**
+
+   The application uses a custom-trained model for ingredient measurement. You have two options to set it up:
+
+   **Option 1: Automatic Download (Recommended)**
+
+   - The app will automatically download the model file when you first run it
+   - No manual steps required
+
+   **Option 2: Manual Download**
+
+   - Download the model file directly from: [Model Download Link](https://drive.google.com/uc?export=download&id=1VaB9qmln89nWr74fhceatvvaTqUQMgqU)
+   - Create a `models` folder in the project root if it doesn't exist
+   - Place the downloaded `checkpoint.pth` file in the `models` folder
+
+4. **Run backend server**
 
    ```bash
    python app.py
    ```
 
-4. **Run frontend**
+5. **Run frontend**
 
    ```bash
    cd frontend
@@ -108,7 +123,7 @@ Built with a minimalistic and clean UI, BakeGenie is designed for efficiency, ac
    npm start
    ```
 
-5. **Access the app**
+6. **Access the app**
    - Open browser and navigate to: `http://localhost:3000`
 
 ---
